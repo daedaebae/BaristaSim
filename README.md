@@ -1,4 +1,4 @@
-# BaristaSim (Chillista)
+# BaristaSim
 
 A cozy 8-bit coffee cart simulation game where you brew coffee, chat with customers, and build your reputation.
 

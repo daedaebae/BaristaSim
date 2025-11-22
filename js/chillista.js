@@ -355,19 +355,19 @@ class Game {
             state: this.state,
             timestamp: Date.now()
         };
-        localStorage.setItem('chillista_save', JSON.stringify(saveData));
+        localStorage.setItem('baristasim_save', JSON.stringify(saveData));
         this.log("Game Saved.", 'system');
     }
 
     resetGame() {
         if (confirm("Are you sure you want to reset your progress? This cannot be undone.")) {
-            localStorage.removeItem('chillista_save');
+            localStorage.removeItem('baristasim_save');
             location.reload();
         }
     }
 
     loadGame() {
-        const saveString = localStorage.getItem('chillista_save');
+        const saveString = localStorage.getItem('baristasim_save');
         if (saveString) {
             try {
                 const saveData = JSON.parse(saveString);
