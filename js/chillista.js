@@ -357,6 +357,19 @@ class Game {
         };
         localStorage.setItem('chillista_save', JSON.stringify(saveData));
         this.log("Game Saved.", 'system');
+        this.audio.playSuccess();
+        
+        // Visual feedback - show a brief success message
+        const saveBtn = document.querySelector('button[onclick="game.saveGame()"]');
+        if (saveBtn) {
+            const originalText = saveBtn.textContent;
+            saveBtn.textContent = "✓ Saved!";
+            saveBtn.style.backgroundColor = 'var(--success-color)';
+            setTimeout(() => {
+                saveBtn.textContent = originalText;
+                saveBtn.style.backgroundColor = '';
+            }, 1500);
+        }
     }
 
     resetGame() {
@@ -386,12 +399,21 @@ class Game {
     }
 
     init() {
+        // Ensure name modal is hidden initially
+        const nameModal = document.getElementById('name-modal');
+        if (nameModal) {
+            nameModal.classList.add('hidden');
+        }
+
         // Try to load game first
         if (this.loadGame()) {
+            // Saved game found - skip name entry and start directly
             this.startGame(false); // false = loaded game, don't randomize weather
         } else {
-            // New game flow
-            document.getElementById('name-modal').classList.remove('hidden');
+            // New game flow - show name entry
+            if (nameModal) {
+                nameModal.classList.remove('hidden');
+            }
         }
 
         // Autosave every 30 seconds
