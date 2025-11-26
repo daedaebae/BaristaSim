@@ -13,9 +13,28 @@
     /* Soft Red */
     --success-color: #81b29a;
     /* Soft Green */
-    /* Soft Green */
     --font-ui: 'VT323', monospace;
     --font-mono: 'VT323', monospace;
+}
+
+/* Dark Mode - Evening Coffee House Theme */
+body.dark-mode {
+    --bg-color: #2c1810;
+    /* Dark Coffee Brown */
+    --text-color: #f5deb3;
+    /* Wheat/Light Tan */
+    --accent-color: #8b4513;
+    /* Saddle Brown/Mocha */
+    --highlight-color: #6b4423;
+    /* Chestnut Brown */
+    --button-bg: #5d3a1a;
+    /* Dark Brown */
+    --button-hover: #7a4e2a;
+    /* Lighter Brown */
+    --error-color: #ff6b6b;
+    /* Bright Red for visibility */
+    --success-color: #90ee90;
+    /* Light Green for visibility */
 }
 
 * {
@@ -36,6 +55,11 @@ body {
     /* Increased base font size */
 }
 
+body.dark-mode {
+    background-color: #1a0f0a;
+    /* Even darker background */
+}
+
 .game-container {
     width: 100%;
     height: 100vh;
@@ -47,6 +71,10 @@ body {
     margin: 0;
     background-color: #fffaf0;
     overflow: hidden;
+}
+
+body.dark-mode .game-container {
+    background-color: var(--bg-color);
 }
 
 /* HUD - Horizontal Icon-Based Layout */
@@ -61,6 +89,11 @@ body {
     border-bottom: 2px solid var(--text-color);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     min-height: 45px;
+}
+
+body.dark-mode .hud-horizontal {
+    background: linear-gradient(180deg, var(--highlight-color) 0%, #4a2f1a 100%);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .hud-item {
@@ -168,6 +201,11 @@ body {
     /* Slight letter spacing */
 }
 
+body.dark-mode .log-entry {
+    background-color: rgba(0, 0, 0, 0.3);
+    color: var(--text-color);
+}
+
 @keyframes slideIn {
     from {
         opacity: 0;
@@ -213,9 +251,17 @@ body {
     background-color: #ffebe6;
 }
 
+body.dark-mode .log-entry.error {
+    background-color: rgba(255, 107, 107, 0.2);
+}
+
 .log-entry.success {
     border-left-color: var(--success-color);
     background-color: #e6f5f0;
+}
+
+body.dark-mode .log-entry.success {
+    background-color: rgba(144, 238, 144, 0.2);
 }
 
 /* Game Log */
@@ -233,6 +279,10 @@ body {
     gap: 0.6rem;
     background-color: #fffaf0;
     scroll-behavior: smooth;
+}
+
+body.dark-mode .game-log {
+    background-color: #1a0f0a;
 }
 
 /* Custom scrollbar styling */
@@ -262,6 +312,10 @@ body {
     flex-direction: column;
     gap: 1rem;
     align-items: center;
+}
+
+body.dark-mode .controls-area {
+    background-color: #2c1810;
 }
 
 .control-group {
@@ -372,6 +426,11 @@ body {
     gap: 2rem;
 }
 
+body.dark-mode #screen-map {
+    background-color: #3d2817;
+    background-image: radial-gradient(#5d3a1a 2px, transparent 2px);
+}
+
 .map-header h2 {
     font-size: 2rem;
     color: var(--text-color);
@@ -398,6 +457,10 @@ body {
     cursor: pointer;
     transition: transform 0.1s;
     box-shadow: 4px 4px 0 var(--text-color);
+}
+
+body.dark-mode .map-node {
+    background-color: #4a2f1a;
 }
 
 .map-node:hover {
@@ -433,6 +496,10 @@ body {
     padding: 2rem;
 }
 
+body.dark-mode #screen-shop {
+    background-color: var(--bg-color);
+}
+
 .shop-header {
     display: flex;
     justify-content: space-between;
@@ -461,6 +528,10 @@ body {
     text-align: center;
     gap: 0.5rem;
     box-shadow: 4px 4px 0 rgba(92, 64, 51, 0.1);
+}
+
+body.dark-mode .shop-item {
+    background: #4a2f1a;
 }
 
 .shop-item .icon {
@@ -572,6 +643,10 @@ body {
     /* Jaunty angle */
 }
 
+body.dark-mode .coffee-menu {
+    background: #3d2817;
+}
+
 .coffee-menu h2 {
     font-size: 2.5rem;
     margin-bottom: 1.5rem;
@@ -592,6 +667,10 @@ body {
     padding-bottom: 2rem;
     position: relative;
     overflow: hidden;
+}
+
+body.dark-mode .visual-area {
+    background-color: #2c1810;
 }
 
 /* Scale up pixel art for larger screens */
@@ -618,6 +697,10 @@ body {
     font-family: var(--font-ui);
     font-size: 1.5rem;
     box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.2);
+}
+
+body.dark-mode .dialogue-box {
+    background-color: #3d2817;
 }
 
 .dialogue-box.hidden {

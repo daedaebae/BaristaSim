@@ -307,7 +307,9 @@ class Game {
                 espressoMachine: false,
                 matchaSet: false // New upgrade
             },
-            unlockedLocations: ['cart']
+            unlockedLocations: ['cart'],
+            darkModeUnlocked: false, // Dark mode unlock state
+            darkModeEnabled: false // Dark mode toggle state
         };
 
         this.ui = {
@@ -338,7 +340,8 @@ class Game {
                 customers: document.getElementById('summary-customers'),
                 tips: document.getElementById('summary-tips')
             },
-            playerName: document.getElementById('player-name-display')
+            playerName: document.getElementById('player-name-display'),
+            darkModeToggle: document.getElementById('dark-mode-toggle')
         };
 
         this.audio = new AudioSystem();
@@ -499,6 +502,12 @@ class Game {
                     this.ui.weatherOverlay.style.opacity = '0';
                 }
             }
+
+            // Restore dark mode state
+            if (this.state.darkModeEnabled) {
+                document.body.classList.add('dark-mode');
+            }
+            this.updateDarkModeToggle();
 
             // Start Real-time Clock
             this.startClock();
@@ -786,6 +795,54 @@ class Game {
             if (document.exitFullscreen) {
                 document.exitFullscreen();
             }
+        }
+    }
+
+    toggleDarkMode() {
+        if (!this.state.darkModeUnlocked) {
+            this.log("🔒 Dark mode locked. Serve 3 customers to unlock!", 'error');
+            this.audio.playError();
+            return;
+        }
+
+        this.state.darkModeEnabled = !this.state.darkModeEnabled;
+
+        if (this.state.darkModeEnabled) {
+            document.body.classList.add('dark-mode');
+            this.log("🌙 Dark mode enabled. Evening vibes activated!", 'success');
+        } else {
+            document.body.classList.remove('dark-mode');
+            this.log("☀️ Light mode enabled. Morning brightness restored!", 'success');
+        }
+
+        this.audio.playAction();
+        this.updateDarkModeToggle();
+        this.saveGame();
+    }
+
+    checkDarkModeUnlock() {
+        if (!this.state.darkModeUnlocked && this.state.stats.customersServed >= 3) {
+            this.state.darkModeUnlocked = true;
+            this.log("🌙 Dark Mode Unlocked! Check the HUD to toggle themes.", 'success');
+            this.audio.playChime();
+            this.updateDarkModeToggle();
+            this.saveGame();
+        }
+    }
+
+    updateDarkModeToggle() {
+        if (!this.ui.darkModeToggle) return;
+
+        if (this.state.darkModeUnlocked) {
+            this.ui.darkModeToggle.textContent = this.state.darkModeEnabled ? '☀️' : '🌙';
+            this.ui.darkModeToggle.title = this.state.darkModeEnabled ? 'Switch to Light Mode' : 'Switch to Dark Mode';
+            this.ui.darkModeToggle.style.opacity = '1';
+            this.ui.darkModeToggle.style.cursor = 'pointer';
+        } else {
+            this.ui.darkModeToggle.textContent = '🔒';
+            this.ui.darkModeToggle.title = 'Locked: Serve 3 customers';
+            this.ui.darkModeToggle.style.opacity = '0.5';
+            this.ui.darkModeToggle.style.cursor = 'not-allowed';
         }
     }
 
@@ -1323,6 +1380,9 @@ class Game {
 
         this.log(`Served ${customer.name}! +$${total.toFixed(2)}`, 'success');
         this.audio.playSuccess();
+
+        // Check for dark mode unlock
+        this.checkDarkModeUnlock();
 
         // Reset
         this.state.currentCustomer = null;
