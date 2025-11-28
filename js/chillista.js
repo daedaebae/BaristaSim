@@ -1079,6 +1079,9 @@ class Game {
             if (parkRepDisplay && this.ui.rep) { // Added null check for this.ui.rep
                 parkRepDisplay.textContent = this.ui.rep.textContent;
             }
+
+            // Update dark mode toggle visibility
+            this.updateDarkModeToggle();
         } catch (e) {
             console.error("Error in updateHUD:", e);
         }
