@@ -343,8 +343,7 @@ class Game {
                 customers: document.getElementById('summary-customers'),
                 tips: document.getElementById('summary-tips')
             },
-            playerName: document.getElementById('player-name-display'),
-            darkModeToggle: document.getElementById('dark-mode-toggle')
+            playerName: document.getElementById('player-name-display')
         };
 
         this.audio = new AudioSystem();
@@ -903,16 +902,30 @@ class Game {
     }
 
     updateDarkModeToggle() {
-        if (!this.ui.darkModeToggle) return;
+        const hud = document.getElementById('hud');
+        if (!hud) return;
 
+        // Remove existing toggle if present
+        const existingToggle = document.getElementById('dark-mode-toggle');
+        if (existingToggle) {
+            existingToggle.remove();
+        }
+
+        // Only create toggle if unlocked
         if (this.state.darkModeUnlocked) {
-            this.ui.darkModeToggle.classList.remove('hidden');
-            this.ui.darkModeToggle.textContent = this.state.darkModeEnabled ? '☀️' : '🌙';
-            this.ui.darkModeToggle.title = this.state.darkModeEnabled ? 'Switch to Light Mode' : 'Switch to Dark Mode';
-            this.ui.darkModeToggle.style.opacity = '1';
-            this.ui.darkModeToggle.style.cursor = 'pointer';
-        } else {
-            this.ui.darkModeToggle.classList.add('hidden');
+            const toggle = document.createElement('div');
+            toggle.id = 'dark-mode-toggle';
+            toggle.className = 'hud-item';
+            toggle.title = this.state.darkModeEnabled ? 'Switch to Light Mode' : 'Switch to Dark Mode';
+            toggle.onclick = () => this.toggleDarkMode();
+            toggle.style.cursor = 'pointer';
+
+            const icon = document.createElement('span');
+            icon.className = 'hud-icon';
+            icon.textContent = this.state.darkModeEnabled ? '☀️' : '🌙';
+
+            toggle.appendChild(icon);
+            hud.appendChild(toggle);
         }
     }
 
