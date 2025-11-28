@@ -6,6 +6,8 @@ A cozy 8-bit coffee cart simulation game where you brew coffee, chat with custom
 
 ## Features
 
+- **Mobile Friendly**: Fully responsive design for playing on the go
+- **Dynamic Interface**: Smooth animations and interactive elements
 - **Cozy Gameplay**: Manage your coffee cart from 8 AM to 5 PM
 - **Multiple Brewing Methods**: AeroPress coffee, Matcha, and Espresso
 - **Customer Interactions**: Engage with diverse customer types through dialogue choices

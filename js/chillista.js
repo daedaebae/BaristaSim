@@ -1570,7 +1570,8 @@ class Game {
             'BEANS_PRM': { key: 'beans_premium', cost: 0.10, name: 'Prm Beans' }, // $0.10 per gram
             'MILK': { key: 'milk', cost: 0.02, name: 'Milk' }, // $0.02 per ml
             'WATER': { key: 'water', cost: 0.004, name: 'Water' }, // $0.004 per ml ($2 for 500ml)
-            'MATCHA': { key: 'matcha_powder', cost: 0.20, name: 'Matcha Powder' }, // $0.20 per gram
+            'MATCHA_STD': { key: 'matcha_powder', cost: 0.20, name: 'Matcha Powder' }, // $0.20 per gram
+            'MATCHA_PRM': { key: 'matcha_powder', cost: 0.20, name: 'Matcha Powder' }, // $0.20 per gram
             'CUPS': { key: 'cups', cost: 0.10, name: 'Paper Cups' }, // $0.10 per cup
             'FILTERS': { key: 'filters', cost: 0.05, name: 'Paper Filters' }, // $0.05 per filter
             'PLANT': { key: 'plant', cost: 20.00, name: 'Potted Plant', type: 'decoration' },

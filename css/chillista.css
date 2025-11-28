@@ -51,9 +51,9 @@ body {
     margin: 0;
     overflow: hidden;
     /* Prevent scrollbars */
-    font-size: 20px;
-    /* Increased base font size */
-    zoom: 110%;
+    font-size: 16px;
+    /* Standard base font size */
+    /* zoom: 110%; Removed for better mobile control */
 }
 
 body.dark-mode {
@@ -1303,4 +1303,138 @@ body.dark-mode .dialogue-box {
     100% {
         opacity: 0.9;
     }
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    body {
+        font-size: 14px;
+    }
+
+    .game-container {
+        height: 100vh;
+        overflow: hidden;
+    }
+
+    /* HUD Adjustments */
+    .hud-horizontal {
+        padding: 0.4rem;
+        gap: 0.4rem;
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        /* Firefox */
+    }
+
+    .hud-horizontal::-webkit-scrollbar {
+        display: none;
+        /* Chrome/Safari */
+    }
+
+    .hud-item {
+        padding: 0.2rem 0.4rem;
+        flex-shrink: 0;
+    }
+
+    .hud-value {
+        font-size: 0.9rem;
+    }
+
+    /* Visual Area */
+    .visual-area {
+        flex-grow: 1;
+        min-height: 0;
+        /* Allow shrinking */
+    }
+
+    /* Controls */
+    .controls-area {
+        padding: 0.5rem;
+        min-height: auto;
+    }
+
+    .control-group {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.5rem;
+    }
+
+    #coffee-controls {
+        grid-template-columns: repeat(3, 1fr);
+        /* Stack more on mobile */
+    }
+
+    .btn {
+        min-height: 44px;
+        /* Touch target size */
+        font-size: 1rem;
+        padding: 0.3rem;
+    }
+
+    /* Modals */
+    .coffee-menu {
+        width: 95%;
+        max-height: 90vh;
+        overflow-y: auto;
+        padding: 1.5rem;
+    }
+
+    .shop-items {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 1rem;
+    }
+
+    .map-grid {
+        gap: 1rem;
+    }
+
+    .map-node {
+        width: 100%;
+        height: 100px;
+    }
+}
+
+/* Dynamic Animations */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.btn.action:active {
+    animation: pulse 0.2s ease-in-out;
+}
+
+.screen.active {
+    animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Enhanced Hover Effects */
+.btn {
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
