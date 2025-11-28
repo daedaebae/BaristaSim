@@ -1,279 +1,8 @@
-class AudioSystem {
-    constructor() {
-        this.context = new (window.AudioContext || window.webkitAudioContext)();
-        this.enabled = true; // Music enabled by default
-        this.bgm = null;
-        this.musicVolume = 0.3;
-        this.sfxVolume = 0.1; // 10% volume
-        this.playlist = ['assets/music_lofi.mp3', 'assets/synthesis.mp3', 'assets/funkylofi.mp3'];
-        this.currentTrackIndex = 0;
-        this.trackPlayCount = 0; // Track how many times the current song has played
-    }
+import { AudioSystem } from './AudioSystem.js';
+import { DialogueSystem } from './DialogueSystem.js';
+import DIALOGUE_DATA from '../data/dialogueData.js';
 
-    toggle() {
-        this.enabled = !this.enabled;
-        if (this.enabled) {
-            this.context.resume();
-            this.playMusic();
-        } else {
-            this.fadeOutAndStop();
-        }
-        return this.enabled;
-    }
-
-    setMusicVolume(val) {
-        this.musicVolume = val / 100;
-        if (this.bgm) this.bgm.volume = this.musicVolume;
-    }
-
-    setSFXVolume(val) {
-        this.sfxVolume = val / 100;
-    }
-
-    playTone(freq, type, duration) {
-        if (!this.enabled) return;
-        const osc = this.context.createOscillator();
-        const gain = this.context.createGain();
-        osc.type = type;
-        osc.frequency.setValueAtTime(freq, this.context.currentTime);
-
-        // Soften the volume based on global SFX volume
-        const volume = this.sfxVolume * 0.3; // Reduced base volume for softer clicks
-
-        gain.gain.setValueAtTime(volume, this.context.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, this.context.currentTime + duration);
-        osc.connect(gain);
-        gain.connect(this.context.destination);
-        osc.start();
-        osc.stop(this.context.currentTime + duration);
-    }
-
-    playAction() {
-        // Softer, lower pitch for general actions
-        this.playTone(300, 'sine', 0.1);
-    }
-    playSuccess() {
-        this.playTone(523.25, 'sine', 0.1);
-        setTimeout(() => this.playTone(659.25, 'sine', 0.1), 100);
-    }
-    playError() {
-        console.log("playError called");
-        console.trace();
-        this.playTone(150, 'sawtooth', 0.3);
-    }
-    playChime() { this.playTone(880, 'triangle', 0.5); }
-
-    playMusic() {
-        if (!this.bgm) {
-            this.playNextTrack();
-        } else if (this.enabled && this.bgm.paused) {
-            this.fadeIn(this.bgm);
-        }
-    }
-
-    playNextTrack() {
-        if (this.bgm) {
-            this.bgm.pause();
-            this.bgm.onended = null;
-        }
-
-        const track = this.playlist[this.currentTrackIndex];
-        this.bgm = new Audio(track);
-        this.bgm.volume = 0; // Start at 0 for fade in
-        this.bgm.loop = false;
-
-        this.bgm.onended = () => {
-            this.trackPlayCount++;
-            if (this.trackPlayCount < 3) {
-                // Replay same track
-                this.bgm.currentTime = 0;
-                this.fadeIn(this.bgm);
-            } else {
-                // Next track
-                this.trackPlayCount = 0;
-                this.currentTrackIndex = (this.currentTrackIndex + 1) % this.playlist.length;
-                this.playNextTrack();
-            }
-        };
-
-        if (this.enabled) {
-            this.fadeIn(this.bgm);
-        }
-    }
-
-    fadeIn(audio) {
-        audio.volume = 0;
-        audio.play().catch(e => console.log("Audio play failed:", e));
-
-        const fadeInterval = setInterval(() => {
-            if (audio.volume < this.musicVolume) {
-                audio.volume = Math.min(audio.volume + 0.05, this.musicVolume);
-            } else {
-                clearInterval(fadeInterval);
-            }
-        }, 200); // Fade in over ~1-2 seconds
-    }
-
-    fadeOutAndStop() {
-        if (!this.bgm) return;
-
-        const fadeInterval = setInterval(() => {
-            if (this.bgm.volume > 0.05) {
-                this.bgm.volume -= 0.05;
-            } else {
-                this.bgm.volume = 0;
-                this.bgm.pause();
-                clearInterval(fadeInterval);
-            }
-        }, 100);
-    }
-
-    stopMusic() {
-        this.fadeOutAndStop();
-    }
-
-    skipToNextTrack() {
-        // Reset play count and move to next track
-        this.trackPlayCount = 0;
-        this.currentTrackIndex = (this.currentTrackIndex + 1) % this.playlist.length;
-
-        // Stop current track and play next
-        if (this.bgm) {
-            this.bgm.pause();
-            this.bgm.onended = null;
-        }
-
-        this.playNextTrack();
-    }
-}
-
-class DialogueSystem {
-    constructor(game) {
-        this.game = game;
-        this.box = document.getElementById('dialogue-box');
-        this.textEl = document.getElementById('dialogue-text');
-        this.queue = [];
-        this.isTyping = false;
-        this.active = false;
-
-        // Simple click to continue
-        this.box.addEventListener('click', () => this.next());
-    }
-
-    show(lines) {
-        if (!Array.isArray(lines)) lines = [lines];
-        this.queue = lines;
-        this.active = true;
-        this.box.classList.remove('hidden');
-        this.next();
-    }
-
-    next() {
-        if (this.isTyping) {
-            // Instant finish
-            this.isTyping = false;
-            this.textEl.textContent = this.currentLine;
-            return;
-        }
-
-        if (this.queue.length === 0) {
-            this.close();
-            return;
-        }
-
-        this.currentLine = this.queue.shift();
-        this.typeLine(this.currentLine);
-    }
-
-    typeLine(line) {
-        this.isTyping = true;
-        this.textEl.textContent = '';
-        let i = 0;
-        const speed = 30; // ms per char
-
-        const type = () => {
-            if (!this.isTyping) return; // Stopped or finished
-            if (i < line.length) {
-                this.textEl.textContent += line.charAt(i);
-                i++;
-                // Play little blip sound?
-                // this.game.audio.playTone(800, 'square', 0.05); 
-                setTimeout(type, speed);
-            } else {
-                this.isTyping = false;
-            }
-        };
-        type();
-    }
-
-    close() {
-        this.active = false;
-        this.box.classList.add('hidden');
-        this.game.onDialogueEnd();
-    }
-}
-
-const DIALOGUE_DATA = {
-    student: {
-        greeting: ["Hey, I'm in a rush.", "Do you have Wi-Fi?", "I need caffeine, stat.", "Got an exam in an hour!", "Is this place quiet enough to study?"],
-        choices: [
-            { text: "Study hard!", effect: { type: 'patience', value: 10, satisfaction: 5 }, response: "Thanks, I'm trying!" },
-            { text: "Need a snack?", effect: { type: 'upsell', chance: 0.4, value: 3, satisfaction: 3 }, response: "Maybe a muffin..." },
-            { text: "Quiet day?", effect: { type: 'reputation', value: 1, satisfaction: 2 }, response: "I hope so." },
-            { text: "Free refill?", effect: { type: 'custom', action: 'refill_offer', satisfaction: 10 }, response: "Really? You're a lifesaver!" },
-            { text: "Good luck!", effect: { type: 'patience', value: 15, satisfaction: 8 }, response: "Thanks! I'll need it." }
-        ]
-    },
-    hipster: {
-        greeting: ["Is this single origin?", "I only drink oat milk.", "Cool vibe here.", "Love the aesthetic.", "Do you roast your own beans?"],
-        choices: [
-            { text: "It's artisanal.", effect: { type: 'reputation', value: 2, satisfaction: 8 }, response: "Nice, I respect that." },
-            { text: "Try the Matcha?", effect: { type: 'upsell', chance: 0.7, value: 5, satisfaction: 5 }, response: "Ooh, matcha sounds good." },
-            { text: "Vinyl is better.", effect: { type: 'patience', value: 15, satisfaction: 12 }, response: "Finally, someone gets it." },
-            { text: "Check out my playlist.", effect: { type: 'custom', action: 'music_compliment', satisfaction: 10 }, response: "This track is fire." },
-            { text: "Locally sourced.", effect: { type: 'reputation', value: 3, satisfaction: 10 }, response: "That's what I like to hear!" }
-        ]
-    },
-    tourist: {
-        greeting: ["Wow, so cute!", "Where is the park?", "Can I take a photo?", "This is so charming!", "Is this a local favorite?"],
-        choices: [
-            { text: "Welcome!", effect: { type: 'tips', value: 2, satisfaction: 8 }, response: "You're so kind! Here's a tip." },
-            { text: "Buy a souvenir?", effect: { type: 'upsell', chance: 0.5, value: 10, satisfaction: 4 }, response: "Oh, a mug? Sure!" },
-            { text: "Park is nearby.", effect: { type: 'reputation', value: 1, satisfaction: 6 }, response: "Thanks for the info!" },
-            { text: "Say cheese!", effect: { type: 'custom', action: 'photo_op', satisfaction: 12 }, response: "*Click* Perfect shot!" },
-            { text: "Try our special!", effect: { type: 'upsell', chance: 0.6, value: 4, satisfaction: 5 }, response: "When in Rome, right?" }
-        ]
-    },
-    regular: {
-        greeting: ["The usual, please.", "Good to see you.", "How's business?", "Another day, another coffee.", "You know what I like."],
-        choices: [
-            { text: "On the house.", effect: { type: 'reputation', value: 5, satisfaction: 15 }, response: "You're the best! I'll tell everyone." },
-            { text: "Try something new?", effect: { type: 'upsell', chance: 0.3, value: 4, satisfaction: 3 }, response: "I trust you. Surprise me." },
-            { text: "Busy day.", effect: { type: 'patience', value: 20, satisfaction: 5 }, response: "Take your time, I'm good." },
-            { text: "How's work?", effect: { type: 'patience', value: 10, satisfaction: 7 }, response: "Same old, same old. Thanks for asking!" }
-        ]
-    },
-    critic: {
-        greeting: ["Impress me.", "I'm writing a review.", "Is this sanitary?", "I've had better.", "Show me what you've got."],
-        choices: [
-            { text: "We use best beans.", effect: { type: 'reputation', value: 3, satisfaction: 5 }, response: "We shall see." },
-            { text: "Complimentary water?", effect: { type: 'patience', value: 15, satisfaction: 3 }, response: "Hmph. Acceptable." },
-            { text: "No photos please.", effect: { type: 'reputation', value: -2, satisfaction: -10 }, response: "Excuse me? I am a journalist!" },
-            { text: "Fresh roasted today.", effect: { type: 'reputation', value: 4, satisfaction: 8 }, response: "Interesting. Continue." }
-        ]
-    },
-    default: {
-        greeting: ["Hello.", "One coffee.", "Nice weather.", "Good morning!", "Smells great in here."],
-        choices: [
-            { text: "How are you?", effect: { type: 'reputation', value: 1, satisfaction: 4 }, response: "I'm good, thanks." },
-            { text: "Want a pastry?", effect: { type: 'upsell', chance: 0.3, value: 3, satisfaction: 2 }, response: "No thanks." },
-            { text: "Nice outfit.", effect: { type: 'patience', value: 5, satisfaction: 6 }, response: "Oh, thank you!" },
-            { text: "Beautiful day!", effect: { type: 'patience', value: 8, satisfaction: 5 }, response: "It really is!" }
-        ]
-    }
-};
-
-class Game {
+export class Game {
     constructor() {
         this.state = {
             time: '08:00 AM', // Simplified for now, will need minutes
@@ -536,7 +265,7 @@ class Game {
                 try {
                     this.dialogue.show([
                         `Welcome back, ${this.state.playerName}.`,
-                        "Just you, the cart, and the beans.",
+                        "Just you, your tools, and the beans...",
                         "Let's brew some magic."
                     ]);
                 } catch (e) {
@@ -806,11 +535,6 @@ class Game {
                 this.audio.playChime();
                 break;
         }
-    }
-
-    hideDialogueChoices() {
-        const choicesContainer = document.getElementById('dialogue-choices');
-        if (choicesContainer) choicesContainer.classList.add('hidden');
     }
 
     onDialogueEnd() {
@@ -1209,13 +933,23 @@ class Game {
             case 'MAP':
                 this.switchScreen('map');
                 return;
-            case 'RELAX':
-                this.handleRelax();
+            case 'CART':
+                this.switchScreen('cart');
+                return;
+            case 'PARK':
+                this.switchScreen('park');
+                return;
+            case 'SUMMARY':
+                this.switchScreen('summary');
                 return;
         }
 
-        // If not a global command, pass to brewing logic
-        this.handleBrewCommand(cmd, cmdParts);
+        // Delegate to specific handlers based on context
+        if (this.ui.screens.cart.classList.contains('active') || !this.ui.screens.cart.classList.contains('hidden')) {
+            this.handleBrewCommand(cmd, cmdParts);
+        } else if (this.ui.screens.shop.classList.contains('active')) {
+            // Shop logic handled by BUY command mostly
+        }
     }
 
     handleBrewCommand(cmd, args) {
@@ -1926,9 +1660,3 @@ class Game {
         return suggestions;
     }
 }
-
-window.onload = () => {
-    new Game();
-};
-
-// End of line, man
