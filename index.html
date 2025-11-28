@@ -38,12 +38,6 @@
                     <span id="rep-display" class="hud-value">0</span>
                 </div>
 
-                <!-- Current Customer -->
-                <div class="hud-item" title="Current customer waiting">
-                    <span class="hud-icon">☕</span>
-                    <span id="customer-display" class="hud-value">Waiting...</span>
-                </div>
-
                 <!-- Inventory Toggle -->
                 <div class="hud-item hud-inventory-toggle" title="Click to view inventory details"
                     onclick="game.toggleInventory()">
@@ -53,16 +47,25 @@
                 </div>
 
                 <!-- Dark Mode Toggle -->
-                <div id="dark-mode-toggle" class="hud-item" title="Locked: Serve 3 customers"
+                <div id="dark-mode-toggle" class="hud-item hidden" title="Locked: Serve 3 customers"
                     onclick="game.toggleDarkMode()" style="opacity: 0.5; cursor: not-allowed;">
                     <span class="hud-icon">🔒</span>
+                </div>
+
+                <!-- Weather Indicator -->
+                <div id="weather-indicator" class="hud-item" title="Current Weather">
+                    <img id="weather-icon" src="assets/weather_sunny.png" alt="Weather" class="weather-icon">
                 </div>
             </div>
 
             <!-- Expandable Inventory Panel -->
             <div id="inventory-panel" class="inventory-panel hidden">
-                <div id="inventory-display">
+                <div id="inventory-display" class="inventory-grid">
                     <!-- Populated by JS -->
+                </div>
+                <div id="shopping-suggestions" class="shopping-suggestions hidden">
+                    <h4>📝 Shopping List</h4>
+                    <ul id="suggestion-list"></ul>
                 </div>
             </div>
             <!-- End of HUD -->
@@ -76,6 +79,14 @@
                 <div class="character-area">
                     <img src="assets/pixel_barista.png" id="barista-avatar" class="avatar barista" alt="Barista">
                     <img id="customer-portrait" class="avatar customer" alt="Customer" style="opacity: 0;">
+
+                    <div id="customer-info-panel" class="customer-info-panel hidden">
+                        <h2 id="customer-name">Guest</h2>
+                        <div class="stats-row">
+                            <div id="patience-meter">Patience: 100%</div>
+                            <div id="satisfaction-meter" class="hidden">Mood: 😐</div>
+                        </div>
+                    </div>
                 </div>
                 <div id="brewing-station" class="brewing-station state-empty">
                     <div class="plunger"></div>
@@ -314,6 +325,12 @@
                     <span>Total Earnings:</span>
                     <span id="summary-earnings">$0.00</span>
                 </div>
+                <div id="summary-customer-area" class="customer-area">
+                    <div id="summary-customer-portrait" class="pixel-art"></div>
+                    <div id="summary-customer-info">
+                        <h2 id="summary-customer-name">Guest</h2>
+                    </div>
+                </div>
                 <div class="stat-row">
                     <span>Customers Served:</span>
                     <span id="summary-customers">0</span>
@@ -337,6 +354,19 @@
             </div>
             <div class="menu-group">
                 <button id="name-submit-btn" class="btn action" style="width: 100%">Start Brewing</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reset Confirmation Modal -->
+    <div id="reset-confirmation-modal" class="menu-overlay hidden">
+        <div class="coffee-menu" style="height: auto;">
+            <h2>Reset Progress?</h2>
+            <p style="margin-bottom: 1.5rem;">This cannot be undone.</p>
+            <div class="menu-group">
+                <button class="btn action" style="width: 100%; background-color: #e74c3c; margin-bottom: 1rem;"
+                    onclick="game.confirmReset()">Yes, Reset Everything</button>
+                <button class="btn nav" style="width: 100%" onclick="game.cancelReset()">Cancel</button>
             </div>
         </div>
     </div>
@@ -368,6 +398,11 @@
             </div>
 
             <div class="menu-group">
+                <label>UI Scale: <span id="ui-scale-value">100%</span></label>
+                <input type="range" min="75" max="150" value="100" class="slider" oninput="game.setUIScale(this.value)">
+            </div>
+
+            <div class="menu-group">
                 <button class="btn action" style="width: 100%" onclick="game.nextTrack()">⏭️ Next Track</button>
             </div>
 
@@ -383,6 +418,10 @@
             <div class="menu-group">
                 <button class="btn action" style="width: 100%; background-color: #e74c3c;"
                     onclick="game.resetGame()">Reset Progress</button>
+            </div>
+
+            <div class="menu-group">
+                <button class="btn nav" style="width: 100%" onclick="game.showHelp()">Help / Tutorial</button>
             </div>
 
             <div class="menu-group">

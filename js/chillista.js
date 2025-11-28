@@ -1,7 +1,7 @@
 class AudioSystem {
     constructor() {
         this.context = new (window.AudioContext || window.webkitAudioContext)();
-        this.enabled = false; // Start muted until interaction
+        this.enabled = true; // Music enabled by default
         this.bgm = null;
         this.musicVolume = 0.3;
         this.sfxVolume = 0.1; // 10% volume
@@ -316,7 +316,10 @@ class Game {
             time: document.getElementById('time-display'),
             cash: document.getElementById('cash-display'),
             rep: document.getElementById('rep-display'),
-            customer: document.getElementById('customer-display'),
+            customerInfoPanel: document.getElementById('customer-info-panel'),
+            customerName: document.getElementById('customer-name'),
+            patienceMeter: document.getElementById('patience-meter'),
+            satisfactionMeter: document.getElementById('satisfaction-meter'),
             inventory: document.getElementById('inventory-display'),
             log: document.getElementById('game-log'),
             brewingStation: document.getElementById('brewing-station'),
@@ -350,7 +353,36 @@ class Game {
         // Expose game instance immediately
         window.game = this;
 
+        // Initialize UI Scale
+        if (this.state.settings && this.state.settings.uiScale) {
+            this.setUIScale(this.state.settings.uiScale);
+            // Update slider position if it exists
+            const slider = document.querySelector('input[oninput="game.setUIScale(this.value)"]');
+            if (slider) slider.value = this.state.settings.uiScale;
+        }
+
+        // Initialize the game (show name modal or load saved game)
         this.init();
+    }
+
+    setUIScale(value) {
+        value = parseInt(value);
+        if (isNaN(value)) return;
+
+        // Clamp between 75 and 150
+        value = Math.max(75, Math.min(150, value));
+
+        // Update state
+        if (!this.state.settings) this.state.settings = {};
+        this.state.settings.uiScale = value;
+
+        // Update label
+        const label = document.getElementById('ui-scale-value');
+        if (label) label.textContent = value + '%';
+
+        // Apply scale (Base font size 16px * scale/100)
+        // We now scale the root element so rem units work for everything (icons, etc)
+        document.documentElement.style.fontSize = (16 * (value / 100)) + 'px';
     }
 
     saveGame() {
@@ -376,10 +408,33 @@ class Game {
     }
 
     resetGame() {
-        if (confirm("Are you sure you want to reset your progress? This cannot be undone.")) {
-            localStorage.removeItem('chillista_save');
-            location.reload();
+        // Hide main menu if open
+        const menu = document.getElementById('menu-overlay');
+        if (menu && !menu.classList.contains('hidden')) {
+            menu.classList.add('hidden');
         }
+
+        // Show confirmation modal
+        const modal = document.getElementById('reset-confirmation-modal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            this.audio.playAction();
+        }
+    }
+
+    confirmReset() {
+        localStorage.removeItem('chillista_save');
+        location.reload();
+    }
+
+    cancelReset() {
+        const modal = document.getElementById('reset-confirmation-modal');
+        if (modal) {
+            modal.classList.add('hidden');
+            this.audio.playAction();
+        }
+        // Re-open main menu
+        this.toggleMenu();
     }
 
     loadGame() {
@@ -419,8 +474,13 @@ class Game {
             }
         }
 
-        // Autosave every 30 seconds
-        setInterval(() => this.saveGame(), 30000);
+        // Autosave every 30 seconds (only when menu is closed)
+        setInterval(() => {
+            const menu = document.getElementById('menu-overlay');
+            if (menu && menu.classList.contains('hidden')) {
+                this.saveGame();
+            }
+        }, 30000);
 
         // Bind Name Submit Button explicitly
         const submitBtn = document.getElementById('name-submit-btn');
@@ -475,18 +535,18 @@ class Game {
                 }
             }, 1000);
 
-            // Global click listener for audio auto-start
+            // Audio unlock on any user interaction
             const unlockAudio = () => {
-                if (!this.audio.enabled) {
-                    this.audio.enabled = true;
-                    this.audio.context.resume().then(() => {
+                this.audio.context.resume().then(() => {
+                    if (!this.audio.bgm || this.audio.bgm.paused) {
                         this.audio.playMusic();
-                    });
-                    // Remove listener after first success
-                    document.removeEventListener('click', unlockAudio);
-                }
+                    }
+                });
+                document.removeEventListener('click', unlockAudio);
+                document.removeEventListener('keydown', unlockAudio);
             };
             document.addEventListener('click', unlockAudio);
+            document.addEventListener('keydown', unlockAudio);
 
             // Initialize weather only for new games (not when loading a saved game)
             if (isNewGame) {
@@ -540,7 +600,7 @@ class Game {
                 this.log("No one to talk to.", 'error');
                 return;
             }
-            this.applyDialogueEffect({ type: 'reputation', value: 1 });
+            this.applyDialogueEffect({ type: 'reputation', value: 1, satisfaction: 5 });
             // Customer responses to small talk
             const responses = [
                 "Lovely weather we're having!",
@@ -561,7 +621,7 @@ class Game {
                 this.log("No one to talk to.", 'error');
                 return;
             }
-            const success = this.applyDialogueEffect({ type: 'upsell', chance: 0.4, value: 3 });
+            const success = this.applyDialogueEffect({ type: 'upsell', chance: 0.4, value: 3, satisfaction: 2 });
             if (success) {
                 const responses = ["Ooh, that looks delicious! I'll take one.", "Sure, why not?", "You twisted my arm!"];
                 this.dialogue.show([`${this.state.currentCustomer.name}: "${responses[Math.floor(Math.random() * responses.length)]}"`]);
@@ -590,19 +650,7 @@ class Game {
         if (!customer) return;
 
         // Determine customer type (fallback to default)
-        // In generateCustomer, we set specialType, but we might need to store it on the customer object explicitly if not already
-        // Let's assume customer.type exists or we infer it. 
-        // Currently generateCustomer sets personality/name but maybe not a raw 'type' string for lookup.
-        // Let's check generateCustomer... it sets 'personality' which is like 'Impatient', 'Rich', etc.
-        // We need to map or ensure we save the type key.
-
-        // FIX: Let's use a simple mapping or fallback based on personality if type isn't saved.
-        // Ideally, we update generateCustomer to save the type key (student, hipster, etc.)
-        // For now, let's try to match or default.
-
         let type = 'default';
-        if (customer.name === 'Critic') type = 'critic'; // Example if we had specific names
-        // Better: let's assume we will update generateCustomer to add a 'type' property.
         if (customer.type && DIALOGUE_DATA[customer.type]) {
             type = customer.type;
         }
@@ -762,7 +810,20 @@ class Game {
 
     toggleMenu() {
         const menu = document.getElementById('menu-overlay');
+        const isOpening = menu.classList.contains('hidden');
         menu.classList.toggle('hidden');
+
+        if (isOpening) {
+            // Pause game when menu opens
+            if (this.clockInterval) {
+                clearInterval(this.clockInterval);
+                this.clockInterval = null;
+            }
+        } else {
+            // Resume game when menu closes
+            this.startClock();
+        }
+
         this.audio.playAction();
     }
 
@@ -796,6 +857,17 @@ class Game {
                 document.exitFullscreen();
             }
         }
+    }
+
+    showHelp() {
+        this.toggleMenu(); // Close menu
+        this.dialogue.show([
+            "How to Play:",
+            "1. Grind beans -> Add Water -> Stir -> Plunge -> Serve.",
+            "2. Talk to customers to boost patience and tips.",
+            "3. Buy upgrades in the Shop to make better drinks.",
+            "4. Watch your reputation to unlock new areas!"
+        ]);
     }
 
     toggleDarkMode() {
@@ -834,15 +906,13 @@ class Game {
         if (!this.ui.darkModeToggle) return;
 
         if (this.state.darkModeUnlocked) {
+            this.ui.darkModeToggle.classList.remove('hidden');
             this.ui.darkModeToggle.textContent = this.state.darkModeEnabled ? '☀️' : '🌙';
             this.ui.darkModeToggle.title = this.state.darkModeEnabled ? 'Switch to Light Mode' : 'Switch to Dark Mode';
             this.ui.darkModeToggle.style.opacity = '1';
             this.ui.darkModeToggle.style.cursor = 'pointer';
         } else {
-            this.ui.darkModeToggle.textContent = '🔒';
-            this.ui.darkModeToggle.title = 'Locked: Serve 3 customers';
-            this.ui.darkModeToggle.style.opacity = '0.5';
-            this.ui.darkModeToggle.style.cursor = 'not-allowed';
+            this.ui.darkModeToggle.classList.add('hidden');
         }
     }
 
@@ -884,33 +954,80 @@ class Game {
             if (this.ui.rep) this.ui.rep.textContent = this.state.stats.reputation;
 
             // Customer Display
-            if (this.ui.customer) {
+            // Customer Display
+            if (this.ui.customerInfoPanel) {
                 if (this.state.currentCustomer) {
                     const c = this.state.currentCustomer;
                     const satisfactionEmoji = this.getSatisfactionEmoji(c.satisfaction);
-                    this.ui.customer.innerHTML = `
-                        <div>${c.name} (${c.personality})</div>
-                        <div>Order: ${c.order}</div>
-                        <div>Mood: ${this.getPatienceLevel(c.patience)}</div>
-                        <div>Satisfaction: ${satisfactionEmoji} ${Math.round(c.satisfaction)}%</div>
-                    `;
+
+                    this.ui.customerInfoPanel.classList.remove('hidden');
+                    if (this.ui.customerName) this.ui.customerName.textContent = `${c.name} (${c.personality})`;
+
+                    if (this.ui.patienceMeter) {
+                        this.ui.patienceMeter.textContent = `Patience: ${Math.round(c.patience)}%`;
+                        // Color code patience
+                        if (c.patience < 30) this.ui.patienceMeter.style.color = 'var(--error-color)';
+                        else this.ui.patienceMeter.style.color = 'var(--highlight-color)';
+                    }
+
+                    if (this.ui.satisfactionMeter) {
+                        this.ui.satisfactionMeter.classList.remove('hidden');
+                        this.ui.satisfactionMeter.textContent = `Mood: ${satisfactionEmoji} (${Math.round(c.satisfaction)}%)`;
+                    }
+
+                    // Also update the old customer display if it exists (for summary screen or fallback)
+                    if (this.ui.customer) {
+                        this.ui.customer.innerHTML = `
+                            <div>${c.name}</div>
+                            <div>Order: ${c.order}</div>
+                        `;
+                    }
                 } else {
-                    this.ui.customer.textContent = "Waiting for a guest...";
+                    this.ui.customerInfoPanel.classList.add('hidden');
                 }
             }
 
             // Inventory
             if (this.ui.inventory) {
                 const inv = this.state.inventory;
+                const suggestions = this.getShoppingSuggestions();
+
+                // Inventory Grid
                 this.ui.inventory.innerHTML = `
-                    <div>Std Beans: ${inv.beans_standard}g</div>
-                    <div>Prm Beans: ${inv.beans_premium}g</div>
-                    <div>Matcha: ${inv.matcha_powder}g</div>
-                    <div>Water: ${inv.water}ml</div>
-                    <div>Milk: ${inv.milk}ml</div>
-                    <div>Cups: ${inv.cups}</div>
-                    <div>Filters: ${inv.filters}</div>
+                    <div class="inventory-item" id="inv-coffee_beans">
+                        <span class="inventory-icon">🫘</span>
+                        <span class="inventory-name">Beans</span>
+                        <span class="inventory-amount">${inv.coffee_beans}g</span>
+                    </div>
+                    <div class="inventory-item" id="inv-milk">
+                        <span class="inventory-icon">🥛</span>
+                        <span class="inventory-name">Milk</span>
+                        <span class="inventory-amount">${inv.milk}ml</span>
+                    </div>
+                    <div class="inventory-item" id="inv-sugar">
+                        <span class="inventory-icon">🍬</span>
+                        <span class="inventory-name">Sugar</span>
+                        <span class="inventory-amount">${inv.sugar}g</span>
+                    </div>
+                    <div class="inventory-item" id="inv-cups">
+                        <span class="inventory-icon">🥤</span>
+                        <span class="inventory-name">Cups</span>
+                        <span class="inventory-amount">${inv.cups}</span>
+                    </div>
                 `;
+
+                // Shopping Suggestions
+                const suggestionList = document.getElementById('suggestion-list');
+                const suggestionContainer = document.getElementById('shopping-suggestions');
+
+                if (suggestionList && suggestionContainer) {
+                    if (suggestions.length > 0) {
+                        suggestionContainer.classList.remove('hidden');
+                        suggestionList.innerHTML = suggestions.map(s => `<li>${s.item}: ${s.reason}</li>`).join('');
+                    } else {
+                        suggestionContainer.classList.add('hidden');
+                    }
+                }
             }
 
             if (this.ui.shopCash) {
@@ -1167,6 +1284,7 @@ class Game {
                         return;
                     }
                     this.state.inventory.cups--;
+                    this.trackResourceUsage('cups', 1);
                     this.serveCustomer();
                     break;
                 default:
@@ -1186,6 +1304,7 @@ class Game {
                         return;
                     }
                     this.state.inventory.matcha_powder -= 5;
+                    this.trackResourceUsage('matcha_powder', 5);
                     this.state.brewingState.step = 1;
                     this.log("Sifted the matcha powder.", 'success');
                     this.audio.playAction();
@@ -1197,6 +1316,7 @@ class Game {
                         return;
                     }
                     this.state.inventory.water -= 100;
+                    this.trackResourceUsage('water', 100);
                     this.state.brewingState.step = 2;
                     this.log("Added hot water.", 'success');
                     this.audio.playAction();
@@ -1241,6 +1361,7 @@ class Game {
                 }
 
                 this.state.inventory[beanKey] -= 20;
+                this.trackResourceUsage(beanKey, 20);
                 this.state.brewingState.step = 1;
                 this.state.brewingState.beanType = type;
                 this.log(`Ground 20g of ${type === 'PRM' ? 'Premium' : 'Standard'} beans.`, 'success');
@@ -1520,18 +1641,37 @@ class Game {
 
     setWeather(type) {
         this.state.weather = type;
-        if (type === 'rainy') {
-            this.ui.weatherOverlay.className = 'weather-overlay weather-rain';
-            this.ui.weatherOverlay.style.opacity = '1';
-            this.log("It's a rainy day. Fewer customers, but cozy vibes.", 'system');
-            this.log("Customers seem less patient in the rain...", 'system');
-        } else {
-            this.ui.weatherOverlay.style.opacity = '0';
-            this.log("It's a sunny day. Perfect weather for coffee!", 'system');
-            this.log("Customers are in a great mood today!", 'system');
+
+        // Update weather icon
+        const weatherIcon = document.getElementById('weather-icon');
+        const weatherIndicator = document.getElementById('weather-indicator');
+
+        if (weatherIcon) {
+            if (type === 'rainy') {
+                weatherIcon.src = 'assets/weather_rainy.png';
+                if (weatherIndicator) weatherIndicator.title = 'Rainy Day';
+            } else if (type === 'sunny') {
+                weatherIcon.src = 'assets/weather_sunny.png';
+                if (weatherIndicator) weatherIndicator.title = 'Sunny Day';
+            } else {
+                weatherIcon.src = 'assets/weather_cloudy.png';
+                if (weatherIndicator) weatherIndicator.title = 'Cloudy Day';
+            }
+        }
+
+        // Update weather overlay
+        if (this.ui.weatherOverlay) {
+            if (type === 'rainy') {
+                this.ui.weatherOverlay.style.opacity = '0.3';
+                this.log("It's a rainy day... Fewer customers, but cozy vibes.", 'system');
+                this.log("Customers seem less patient in the rain.", 'system');
+            } else if (type === 'sunny') {
+                this.ui.weatherOverlay.style.opacity = '0';
+                this.log("It's a sunny day! Perfect weather for coffee.", 'system');
+                this.log("Customers are in a great mood today!", 'success');
+            }
         }
     }
-
     startNewDay() {
         this.state.minutesElapsed = 0;
         this.state.stats.dailyEarnings = 0;
@@ -1544,7 +1684,7 @@ class Game {
         this.updateBrewingVisuals();
         this.ui.customerPortrait.style.opacity = '0';
         this.ui.log.innerHTML = ''; // Clear log
-
+        this.log(`Day ${this.state.day} started!`, 'system');
         // Random Weather
         const weather = Math.random() > 0.7 ? 'rainy' : 'sunny';
         this.setWeather(weather);
@@ -1654,8 +1794,13 @@ class Game {
 
             this.audio.playChime();
 
+            // Log customer arrival
+            const personalityText = specialType ? ` (${specialType.charAt(0).toUpperCase() + specialType.slice(1)})` : '';
+            this.log(`☕ ${name}${personalityText} arrived and ordered ${order}`, 'success');
+
             // Update both portraits (Cart and Park)
             this.ui.customerPortrait.src = this.state.currentCustomer.portrait;
+            this.ui.customerPortrait.setAttribute('data-mood', this.state.currentCustomer.getStatusText());
             this.ui.customerPortrait.style.opacity = '1';
 
             // Special Dialogue
@@ -1678,9 +1823,9 @@ class Game {
             }
 
             // Trigger animation
-            this.ui.customer.classList.remove('customer-arrive');
-            void this.ui.customer.offsetWidth;
-            this.ui.customer.classList.add('customer-arrive');
+            this.ui.customerPortrait.classList.remove('customer-arrive');
+            void this.ui.customerPortrait.offsetWidth;
+            this.ui.customerPortrait.classList.add('customer-arrive');
 
             this.updateHUD();
         } catch (e) {
@@ -1701,14 +1846,75 @@ class Game {
             customer.patience -= (customer.decay * minutesPassed * decayModifier);
 
             if (customer.patience <= 0) {
-                this.log(`${customer.name} left quietly.`, 'error');
+                this.log(`${customer.name} left in anger! -5 Rep`, 'error');
+                this.state.stats.reputation = Math.max(0, this.state.stats.reputation - 5);
+                this.audio.playError();
+
                 this.state.currentCustomer = null;
                 this.ui.customerPortrait.style.opacity = '0';
-                // Penalty?
+                this.updateHUD();
             }
         } catch (e) {
             console.error("Error in checkCustomerPatience:", e);
         }
+    }
+    trackResourceUsage(resource, amount) {
+        if (!this.state.resourceUsage) {
+            this.state.resourceUsage = {
+                coffee_beans: { used: 0, lastRestockDay: 1 },
+                milk: { used: 0, lastRestockDay: 1 },
+                sugar: { used: 0, lastRestockDay: 1 },
+                cups: { used: 0, lastRestockDay: 1 }
+            };
+        }
+        if (!this.state.resourceUsage[resource]) {
+            this.state.resourceUsage[resource] = { used: 0, lastRestockDay: this.state.day };
+        }
+        this.state.resourceUsage[resource].used += amount;
+        this.checkLowStock();
+    }
+
+    checkLowStock() {
+        const thresholds = {
+            coffee_beans: 5,
+            milk: 3,
+            sugar: 3,
+            cups: 5,
+            matcha_powder: 5,
+            water: 100
+        };
+
+        for (const [resource, amount] of Object.entries(this.state.inventory)) {
+            if (thresholds[resource] && amount <= thresholds[resource]) {
+                const el = document.getElementById(`inv-${resource}`);
+                if (el) el.classList.add('resource-low');
+
+                // Only warn once per day or session? For now, just warn.
+                // To prevent spam, maybe check if we already warned?
+                // Simplified: just log if critical.
+                if (amount === 0) {
+                    // this.log(`Out of ${resource}!`, 'error'); // Can be spammy
+                }
+            } else {
+                const el = document.getElementById(`inv-${resource}`);
+                if (el) el.classList.remove('resource-low');
+            }
+        }
+    }
+
+    getShoppingSuggestions() {
+        const suggestions = [];
+        const usage = this.state.resourceUsage;
+        const inventory = this.state.inventory;
+
+        // Simple logic: if stock < 3 days worth of average usage, suggest buying
+        // For now, hardcoded "safe" levels
+        if (inventory.coffee_beans < 50) suggestions.push({ item: 'Standard Beans', reason: 'Low Stock' });
+        if (inventory.milk < 20) suggestions.push({ item: 'Milk', reason: 'Running Low' });
+        if (inventory.sugar < 20) suggestions.push({ item: 'Sugar', reason: 'Sweetness needed' });
+        if (inventory.cups < 30) suggestions.push({ item: 'Cups', reason: 'Essential' });
+
+        return suggestions;
     }
 }
 
