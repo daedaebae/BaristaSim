@@ -1,21 +1,35 @@
-# Planned Features
+# Planned Features v2
 
-## Immediate Priorities (In Progress)
+## Recently Completed (Phase 2)
 - **Resource Management**:
-    - Usage tracking per customer.
-    - Low stock warnings.
-    - Smart shopping suggestions.
+    - [x] Usage tracking per customer.
+    - [x] Low stock warnings (visual indicators).
+    - [x] Smart shopping suggestions.
 - **Pantry UI**:
-    - Enhanced visual layout.
-    - Usage statistics.
-    - Quick restock options.
+    - [x] Enhanced visual layout with icons.
+    - [x] Usage statistics display.
 - **Conversation System**:
-    - Satisfaction meter.
-    - Context-aware dialogue.
-    - Feedback on dialogue choices.
+    - [x] Satisfaction meter with emojis.
+    - [x] Context-aware dialogue (weather-based).
+    - [x] Feedback on dialogue choices (chimes, visual cues).
+- **UI Polish**:
+    - [x] Settings menu (volume, scale).
+    - [x] Real-time clock.
+    - [x] Map screen navigation.
+    - [x] Animated weather GIFs.
+    - [x] Customer portrait hover tooltip.
 
-## Future Ideas
-- **Recipe Expansion**: Latte art, seasonal drinks.
-- **Staff Management**: Hire help as the shop grows.
-- **Customization**: Decorate the cart/shop.
-- **Events**: Rainy days, festivals, rush hours.
+## Upcoming Priorities (Phase 3)
+- **Recipe Expansion**:
+    - [ ] Latte art mini-game/quality check.
+    - [ ] Seasonal drinks (Pumpkin Spice, Peppermint).
+- **Staff Management**:
+    - [ ] Hire a barista to automate brewing.
+    - [ ] Staff wages and shifts.
+- **Customization**:
+    - [ ] Decorate the cart (unlockable skins).
+    - [ ] Customizable menu board.
+- **Events**:
+    - [ ] Festivals (high traffic).
+    - [ ] Rush hour mechanics.
+
