@@ -45,7 +45,8 @@ export class Game {
                 weatherDisabled: false,
                 customerArrivalDisabled: false,
                 timePaused: false,
-                infiniteResources: false
+                infiniteResources: false,
+                timeSpeed: 1 // 1x, 2x, 5x, or 10x
             }
         };
 
@@ -388,9 +389,11 @@ export class Game {
 
     startClock() {
         if (this.clockInterval) clearInterval(this.clockInterval);
+        const speed = this.state.debug.timeSpeed || 1;
+        const interval = 1000 / speed; // Faster interval for higher speeds
         this.clockInterval = setInterval(() => {
             this.advanceTime(1);
-        }, 1000); // 1 real second = 1 game minute
+        }, interval);
     }
 
     handleDialogueCommand(cmd) {
@@ -672,17 +675,17 @@ export class Game {
 
         if (isOpening) {
             // Update checkboxes to match current debug state
-            const enabledCheckbox = document.getElementById('debug-enabled');
             const weatherCheckbox = document.getElementById('debug-weather-disabled');
             const customerCheckbox = document.getElementById('debug-customer-arrival-disabled');
             const timeCheckbox = document.getElementById('debug-time-paused');
             const resourcesCheckbox = document.getElementById('debug-infinite-resources');
+            const timeSpeedBtn = document.getElementById('time-speed-btn');
 
-            if (enabledCheckbox) enabledCheckbox.checked = this.state.debug.enabled;
             if (weatherCheckbox) weatherCheckbox.checked = this.state.debug.weatherDisabled;
             if (customerCheckbox) customerCheckbox.checked = this.state.debug.customerArrivalDisabled;
             if (timeCheckbox) timeCheckbox.checked = this.state.debug.timePaused;
             if (resourcesCheckbox) resourcesCheckbox.checked = this.state.debug.infiniteResources;
+            if (timeSpeedBtn) timeSpeedBtn.textContent = `⏩ Time Speed: ${this.state.debug.timeSpeed || 1}x`;
         }
 
         this.audio.playAction();
@@ -774,6 +777,27 @@ export class Game {
         this.state.cash += amount;
         this.updateHUD();
         this.log(`Added $${amount}`, 'success');
+        this.saveGame();
+    }
+
+    debugToggleTimeSpeed() {
+        const speeds = [1, 2, 5, 10];
+        const currentIndex = speeds.indexOf(this.state.debug.timeSpeed || 1);
+        const nextIndex = (currentIndex + 1) % speeds.length;
+        this.state.debug.timeSpeed = speeds[nextIndex];
+
+        // Update button text
+        const btn = document.getElementById('time-speed-btn');
+        if (btn) {
+            btn.textContent = `⏩ Time Speed: ${this.state.debug.timeSpeed}x`;
+        }
+
+        // Restart clock with new speed
+        if (!this.state.debug.timePaused) {
+            this.startClock();
+        }
+
+        this.log(`Time speed set to ${this.state.debug.timeSpeed}x`, 'system');
         this.saveGame();
     }
 

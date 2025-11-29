@@ -420,7 +420,8 @@
             </div>
 
             <div class="menu-group">
-                <button class="btn nav" style="width: 100%; background-color: #6c757d;" onclick="game.toggleDebugMenu()">🐛 Debug Menu</button>
+                <button class="btn nav" style="width: 100%; background-color: #6c757d;"
+                    onclick="game.toggleDebugMenu()">🐛 Debug Menu</button>
             </div>
 
             <div class="menu-group">
@@ -437,49 +438,54 @@
 
             <div class="menu-group">
                 <label>
-                    <input type="checkbox" id="debug-enabled" onchange="game.setDebugEnabled(this.checked)">
-                    Enable Debug Mode
-                </label>
-            </div>
-
-            <div class="menu-group">
-                <label>
-                    <input type="checkbox" id="debug-weather-disabled" onchange="game.setDebugOption('weatherDisabled', this.checked)">
+                    <input type="checkbox" id="debug-weather-disabled"
+                        onchange="game.setDebugOption('weatherDisabled', this.checked)">
                     Disable Weather Effects
                 </label>
             </div>
 
             <div class="menu-group">
                 <label>
-                    <input type="checkbox" id="debug-customer-arrival-disabled" onchange="game.setDebugOption('customerArrivalDisabled', this.checked)">
+                    <input type="checkbox" id="debug-customer-arrival-disabled"
+                        onchange="game.setDebugOption('customerArrivalDisabled', this.checked)">
                     Disable Customer Arrivals
                 </label>
             </div>
 
             <div class="menu-group">
                 <label>
-                    <input type="checkbox" id="debug-time-paused" onchange="game.setDebugOption('timePaused', this.checked)">
+                    <input type="checkbox" id="debug-time-paused"
+                        onchange="game.setDebugOption('timePaused', this.checked)">
                     Pause Time
                 </label>
             </div>
 
             <div class="menu-group">
                 <label>
-                    <input type="checkbox" id="debug-infinite-resources" onchange="game.setDebugOption('infiniteResources', this.checked)">
+                    <input type="checkbox" id="debug-infinite-resources"
+                        onchange="game.setDebugOption('infiniteResources', this.checked)">
                     Infinite Resources
                 </label>
             </div>
 
             <div class="menu-group">
-                <button class="btn action" style="width: 100%" onclick="game.debugForceWeather('sunny')">Force Sunny Weather</button>
+                <button class="btn action" style="width: 100%" onclick="game.debugForceWeather('sunny')">Force Sunny
+                    Weather</button>
             </div>
 
             <div class="menu-group">
-                <button class="btn action" style="width: 100%" onclick="game.debugForceWeather('rainy')">Force Rainy Weather</button>
+                <button class="btn action" style="width: 100%" onclick="game.debugForceWeather('rainy')">Force Rainy
+                    Weather</button>
             </div>
 
             <div class="menu-group">
-                <button class="btn action" style="width: 100%" onclick="game.debugSpawnCustomer()">Spawn Customer</button>
+                <button class="btn action" style="width: 100%" onclick="game.debugSpawnCustomer()">Spawn
+                    Customer</button>
+            </div>
+
+            <div class="menu-group">
+                <button class="btn action" style="width: 100%" onclick="game.debugToggleTimeSpeed()"
+                    id="time-speed-btn">⏩ Time Speed: 1x</button>
             </div>
 
             <div class="menu-group">
