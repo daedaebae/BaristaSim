@@ -99,7 +99,7 @@ export class Game {
 
         // Initialize the game (show name modal or load saved game)
         this.init();
-        
+
         // Setup customer portrait touch/click handlers
         this.setupCustomerPortraitTouch();
     }
@@ -121,7 +121,7 @@ export class Game {
         // Add click/touch handler for customer portrait to toggle info panel on mobile
         if (this.ui.customerPortrait && !this.ui.customerPortrait.hasAttribute('data-touch-setup')) {
             this.ui.customerPortrait.setAttribute('data-touch-setup', 'true');
-            
+
             this.ui.customerPortrait.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const panel = this.ui.customerInfoPanel;
@@ -133,13 +133,13 @@ export class Game {
                     }
                 }
             });
-            
+
             // Also handle touch events for better mobile support
             let touchStartTime = 0;
             this.ui.customerPortrait.addEventListener('touchstart', (e) => {
                 touchStartTime = Date.now();
             });
-            
+
             this.ui.customerPortrait.addEventListener('touchend', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -357,7 +357,7 @@ export class Game {
                 // Just ensure visual state matches
                 if (this.state.weather === 'rainy') {
                     this.ui.weatherOverlay.className = 'weather-overlay weather-rain';
-                    this.ui.weatherOverlay.style.opacity = '0.3';
+                    this.ui.weatherOverlay.style.opacity = '1';
                     if (this.ui.weatherIcon) {
                         this.ui.weatherIcon.src = 'assets/weather_rainy.png';
                     }
@@ -408,10 +408,10 @@ export class Game {
                 return;
             }
             this.applyDialogueEffect({ type: 'reputation', value: 1, satisfaction: 5 });
-            
+
             // Context-aware responses based on game state
             let responses = [];
-            
+
             if (this.state.weather === 'rainy') {
                 responses = [
                     "Lovely to have a warm drink on a rainy day!",
@@ -429,7 +429,7 @@ export class Game {
                     "This place is so cozy."
                 ];
             }
-            
+
             const response = responses[Math.floor(Math.random() * responses.length)];
             this.dialogue.show([`${this.state.currentCustomer.name}: "${response}"`]);
             this.hideDialogueChoices();
@@ -607,12 +607,12 @@ export class Game {
                 this.handleCustomDialogueAction(effect.action);
                 break;
         }
-        
+
         // Log all feedback messages
         feedbackMessages.forEach(msg => {
             this.log(msg, effect.satisfaction > 0 ? 'success' : effect.satisfaction < 0 ? 'error' : 'system');
         });
-        
+
         this.updateHUD();
     }
 
@@ -695,23 +695,23 @@ export class Game {
             this.state.debug.customerArrivalDisabled = false;
             this.state.debug.timePaused = false;
             this.state.debug.infiniteResources = false;
-            
+
             // Update checkboxes
             const weatherCheckbox = document.getElementById('debug-weather-disabled');
             const customerCheckbox = document.getElementById('debug-customer-arrival-disabled');
             const timeCheckbox = document.getElementById('debug-time-paused');
             const resourcesCheckbox = document.getElementById('debug-infinite-resources');
-            
+
             if (weatherCheckbox) weatherCheckbox.checked = false;
             if (customerCheckbox) customerCheckbox.checked = false;
             if (timeCheckbox) timeCheckbox.checked = false;
             if (resourcesCheckbox) resourcesCheckbox.checked = false;
-            
+
             // Restore weather if it was disabled
             if (this.state.weather === 'rainy') {
                 this.setWeather('rainy');
             }
-            
+
             // Resume time if it was paused
             if (this.clockInterval === null && !this.state.debug.timePaused) {
                 this.startClock();
@@ -726,9 +726,9 @@ export class Game {
             this.log("Enable Debug Mode first", 'error');
             return;
         }
-        
+
         this.state.debug[option] = value;
-        
+
         // Handle specific options
         if (option === 'timePaused') {
             if (value) {
@@ -756,7 +756,7 @@ export class Game {
         } else if (option === 'infiniteResources') {
             this.log(`Infinite resources ${value ? 'enabled' : 'disabled'}`, 'system');
         }
-        
+
         this.saveGame();
     }
 
@@ -1138,7 +1138,7 @@ export class Game {
             if (this.state.debug && this.state.debug.timePaused) {
                 return;
             }
-            
+
             this.state.minutesElapsed += minutes;
             this.updateHUD();
             this.checkCustomerPatience(minutes);
@@ -1577,8 +1577,8 @@ export class Game {
             'FILTERS': { key: 'filters', cost: 0.05, name: 'Paper Filters' }, // $0.05 per filter
             'PLANT': { key: 'plant', cost: 20.00, name: 'Potted Plant', type: 'decoration' },
             'UPGRADE_GRINDER': { key: 'fastGrinder', cost: 50.00, name: 'Fast Grinder', type: 'upgrade' },
-            'UPGRADE_MATCHA': { key: 'matchaSet', cost: 100.00, name: 'Matcha Set', type: 'upgrade' },
-            'UPGRADE_ESPRESSO': { key: 'espressoMachine', cost: 250.00, name: 'Espresso Machine', type: 'upgrade' }
+            'UPGRADE_MATCHA': { key: 'matchaSet', cost: 200.00, name: 'Matcha Set', type: 'upgrade', minTime: 120, minRep: 5 },
+            'UPGRADE_ESPRESSO': { key: 'espressoMachine', cost: 500.00, name: 'Espresso Machine', type: 'upgrade', minTime: 240, minRep: 15 }
         };
 
         const itemKey = args[1];
@@ -1588,6 +1588,21 @@ export class Game {
 
         const item = itemMap[itemKey];
         const totalCost = item.cost * quantity;
+
+        // Check upgrade requirements
+        if (item.type === 'upgrade') {
+            if (item.minTime && this.state.minutesElapsed < item.minTime) {
+                const hoursNeeded = Math.ceil((item.minTime - this.state.minutesElapsed) / 60);
+                this.log(`${item.name} unlocks after ${hoursNeeded} more hour(s) of gameplay`, 'error');
+                this.audio.playError();
+                return;
+            }
+            if (item.minRep && this.state.stats.reputation < item.minRep) {
+                this.log(`${item.name} requires ${item.minRep} reputation (you have ${this.state.stats.reputation})`, 'error');
+                this.audio.playError();
+                return;
+            }
+        }
 
         if (this.state.cash >= totalCost) {
             this.state.cash -= totalCost;
@@ -1662,12 +1677,12 @@ export class Game {
         if (this.state.debug && this.state.debug.weatherDisabled) {
             type = 'sunny'; // Force sunny if weather is disabled
         }
-        
+
         this.state.weather = type;
         if (this.ui.weatherOverlay) {
             if (type === 'rainy') {
                 this.ui.weatherOverlay.className = 'weather-overlay weather-rain';
-                this.ui.weatherOverlay.style.opacity = '0.3';
+                this.ui.weatherOverlay.style.opacity = '1';
                 if (!this.state.debug || !this.state.debug.weatherDisabled) {
                     this.log("It's a rainy day... Fewer customers, but cozy vibes.", 'system');
                     this.log("Customers seem less patient in the rain.", 'system');

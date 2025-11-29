@@ -125,10 +125,7 @@ body.dark-mode .hud-horizontal {
     width: 3rem;
     height: 3rem;
     image-rendering: pixelated;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4)) 
-            drop-shadow(0 0 8px rgba(255, 255, 255, 0.3))
-            brightness(1.1) 
-            contrast(1.1);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4)) drop-shadow(0 0 8px rgba(255, 255, 255, 0.3)) brightness(1.1) contrast(1.1);
     transition: transform 0.3s ease, filter 0.3s ease;
     border-radius: 50%;
     background: #e8e8e8;
@@ -139,10 +136,7 @@ body.dark-mode .hud-horizontal {
 
 .weather-icon:hover {
     transform: scale(1.1);
-    filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.5)) 
-            drop-shadow(0 0 12px rgba(255, 255, 255, 0.5))
-            brightness(1.2) 
-            contrast(1.2);
+    filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 12px rgba(255, 255, 255, 0.5)) brightness(1.2) contrast(1.2);
 }
 
 .hud-value {
@@ -598,7 +592,7 @@ body.dark-mode #screen-map {
     backdrop-filter: blur(4px);
 }
 
-.avatar.customer:hover + .customer-info-panel,
+.avatar.customer:hover+.customer-info-panel,
 .customer-info-panel:hover {
     opacity: 1;
     pointer-events: auto;
@@ -1010,23 +1004,41 @@ body.dark-mode .dialogue-box {
 }
 
 .weather-overlay.weather-rain {
-    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAFElEQVQYV2NkYGD4z4AHMP7//x8A3HgT/4hVwXIAAAAASUVORK5CYII=');
-    /* Simple pixel dot pattern */
-    background-size: 4px 4px;
-    animation: rain 0.5s linear infinite;
-    opacity: 0.3;
+    /* Darker overcast background */
+    background: linear-gradient(180deg,
+            rgba(40, 50, 60, 0.5) 0%,
+            rgba(60, 70, 80, 0.4) 50%,
+            rgba(50, 60, 70, 0.3) 100%);
+    opacity: 1;
     pointer-events: none;
+}
+
+.weather-overlay.weather-rain::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image:
+        linear-gradient(transparent 0%, transparent 40%, rgba(200, 220, 240, 0.3) 40%, rgba(200, 220, 240, 0.3) 42%, transparent 42%),
+        linear-gradient(90deg, transparent 0%, transparent 48%, rgba(200, 220, 240, 0.2) 48%, rgba(200, 220, 240, 0.2) 52%, transparent 52%);
+    background-size: 3px 15px, 15px 3px;
+    background-position: 0 0, 0 0;
+    animation: rain 0.3s linear infinite;
+    opacity: 0.6;
 }
 
 @keyframes rain {
     from {
-        background-position: 0 0;
+        background-position: 0 0, 0 0;
     }
 
     to {
-        background-position: -10px 20px;
+        background-position: -3px 15px, -15px 3px;
     }
 }
+
 
 .bg-image {
     position: absolute;
@@ -1145,8 +1157,8 @@ body.dark-mode .dialogue-box {
 
 .avatar.customer {
     border-color: var(--highlight-color);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 
-                0 0 20px rgba(210, 180, 140, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3),
+        0 0 20px rgba(210, 180, 140, 0.3);
 }
 
 .avatar.barista {
@@ -1454,8 +1466,8 @@ body.dark-mode .dialogue-box {
 
     .avatar.customer {
         border-width: 3px;
-        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3), 
-                    0 0 15px rgba(210, 180, 140, 0.2);
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3),
+            0 0 15px rgba(210, 180, 140, 0.2);
     }
 
     .customer-info-panel {
@@ -1607,18 +1619,19 @@ body.dark-mode .dialogue-box {
 
 /* Touch-friendly hover states for mobile */
 @media (hover: none) and (pointer: coarse) {
-    .avatar.customer:active ~ .customer-info-panel,
+
+    .avatar.customer:active~.customer-info-panel,
     .customer-wrapper:active .customer-info-panel {
         opacity: 1 !important;
         pointer-events: auto !important;
         transform: translateX(-50%) translateY(-5px) !important;
     }
-    
+
     /* Show customer info on tap */
     .customer-wrapper {
         position: relative;
     }
-    
+
     .customer-info-panel.show-on-touch {
         opacity: 1;
         pointer-events: auto;
