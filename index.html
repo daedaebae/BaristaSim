@@ -16,32 +16,32 @@
             <div id="hud" class="hud-horizontal">
                 <!-- Player Name -->
                 <div class="hud-item" title="Your barista name">
-                    <span class="hud-icon">👤</span>
+                    <span class="hud-icon icon-player"></span>
                     <span id="player-name-display" class="hud-value">Guest</span>
                 </div>
 
                 <!-- Time -->
                 <div class="hud-item" title="Current time (8 AM - 5 PM)">
-                    <span class="hud-icon">⏰</span>
+                    <span class="hud-icon icon-clock"></span>
                     <span id="time-display" class="hud-value">08:00 AM</span>
                 </div>
 
                 <!-- Cash -->
                 <div class="hud-item" title="Your current funds">
-                    <span class="hud-icon">💰</span>
+                    <span class="hud-icon icon-cash"></span>
                     <span id="cash-display" class="hud-value">$50.00</span>
                 </div>
 
                 <!-- Reputation -->
                 <div class="hud-item" title="Your reputation level">
-                    <span class="hud-icon">⭐</span>
+                    <span class="hud-icon icon-rep"></span>
                     <span id="rep-display" class="hud-value">0</span>
                 </div>
 
                 <!-- Inventory Toggle -->
                 <div class="hud-item hud-inventory-toggle" title="Click to view inventory details"
                     onclick="game.toggleInventory()">
-                    <span class="hud-icon">📦</span>
+                    <span class="hud-icon icon-pantry"></span>
                     <span class="hud-value">Pantry</span>
                     <span class="hud-expand">▼</span>
                 </div>
@@ -184,7 +184,7 @@
             <div class="visual-area park-bg">
                 <div class="character-area">
                     <img src="assets/pixel_barista.png" class="avatar barista" alt="Barista">
-                    <img id="park-customer-portrait" class="avatar customer" alt="Customer" style="opacity: 0;">
+                    <div id="park-customer-portrait" class="avatar customer" style="opacity: 0;"></div>
                 </div>
                 <!-- Park has no brewing station visible, it's a "rush" mode or maybe just same mechanics? 
                      For simplicity, let's reuse the brewing station UI but overlay it or just copy it.

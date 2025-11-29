@@ -1708,8 +1708,12 @@ export class Game {
         if (this.ui.weatherIcon) {
             if (type === 'rainy') {
                 this.ui.weatherIcon.src = 'assets/weather_rainy.png';
+                this.ui.weatherIcon.classList.remove('sunny');
+                this.ui.weatherIcon.classList.add('rainy');
             } else if (type === 'sunny') {
                 this.ui.weatherIcon.src = 'assets/weather_sunny.png';
+                this.ui.weatherIcon.classList.remove('rainy');
+                this.ui.weatherIcon.classList.add('sunny');
             }
         }
     }
@@ -1798,6 +1802,14 @@ export class Game {
             if (specialType === 'student') patience = 70;
             if (specialType === 'tourist') patience = 120;
 
+            // Avatar Logic
+            let avatarIndex = 0; // Default
+            if (specialType === 'student') avatarIndex = 1;
+            else if (specialType === 'hipster') avatarIndex = 2;
+            else if (specialType === 'tourist') avatarIndex = 3;
+            else if (specialType === 'regular') avatarIndex = 4;
+            else if (specialType === 'critic') avatarIndex = 5;
+
             // Weather affects customer patience
             if (this.state.weather === 'rainy') {
                 patience = Math.floor(patience * 0.8); // Rainy: customers are 20% less patient
@@ -1814,10 +1826,6 @@ export class Game {
                 order = 'Espresso'; // Simplification, could be Latte/Cappuccino
             }
 
-            // Portrait Logic
-            let portrait = 'assets/pixel_customer_1.png';
-            // if (Math.random() > 0.5) portrait = 'assets/pixel_customer_2.png';
-
             this.state.currentCustomer = {
                 name: name,
                 type: specialType || 'default',
@@ -1826,7 +1834,7 @@ export class Game {
                 patience: patience,
                 maxPatience: patience,
                 decay: isPark ? 0.8 : 0.5,
-                portrait: portrait,
+                avatarIndex: avatarIndex,
                 specialType: specialType,
                 arrivalTime: this.state.minutesElapsed,
                 satisfaction: 50, // Start at neutral (0-100 scale)
@@ -1840,7 +1848,10 @@ export class Game {
             this.log(`☕ ${name}${personalityText} arrived and ordered ${order}`, 'success');
 
             // Update both portraits (Cart and Park)
-            this.ui.customerPortrait.src = this.state.currentCustomer.portrait;
+            // Remove old sprite classes
+            this.ui.customerPortrait.className = 'avatar customer';
+            this.ui.customerPortrait.classList.add(`customer-${avatarIndex}`);
+
             this.ui.customerPortrait.setAttribute('data-mood', this.state.currentCustomer.getStatusText());
             this.ui.customerPortrait.style.opacity = '1';
 
@@ -1862,7 +1873,8 @@ export class Game {
 
             const parkPortrait = document.getElementById('park-customer-portrait');
             if (parkPortrait) {
-                parkPortrait.src = this.state.currentCustomer.portrait;
+                parkPortrait.className = 'avatar customer';
+                parkPortrait.classList.add(`customer-${avatarIndex}`);
                 parkPortrait.style.opacity = '1';
             }
 
