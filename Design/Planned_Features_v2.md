@@ -43,4 +43,19 @@
 - **Events**:
     - [ ] Festivals (high traffic).
     - [ ] Rush hour mechanics.
+- **Upgrades**:
+    - [ ] Upgrade system (cost, effect).
+        - [ ] Upgrades tab in the store.
+    - [ ] Upgrade requirements (cash, reputation).
+- **Mode System**:
+    - [ ] Hide the mode button and make it an unlockable item. Each mode can be purchased from the store under the 'upgrades' tab. 
+    - [ ] Create three separate mode menus. When pressing the mode button a small header should display what mode you are in: 
+        - [ ] aeropress, matcha, espresso machine. 
+        - [ ] Pressing the mode button should open the mode menu.
+        - [ ] Each mode should have its own unique brewing method and ingredients.
+- **Debug**:
+    - [ ] Debug mode (cheats, stats).
+    - [ ] Debug menu (cheats, stats).
+    - [ ] Debug menu (cheats, stats).
+
 

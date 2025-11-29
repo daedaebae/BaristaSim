@@ -220,7 +220,13 @@
                 <h2>Supply Shop</h2>
                 <div class="shop-cash">Funds: <span id="shop-cash-display">$0.00</span></div>
             </div>
-            <div class="shop-items">
+
+            <div class="shop-tabs">
+                <button class="tab-btn active" onclick="game.switchShopTab('supplies')">Supplies</button>
+                <button class="tab-btn" onclick="game.switchShopTab('upgrades')">Upgrades</button>
+            </div>
+
+            <div id="shop-supplies" class="shop-items">
                 <div class="shop-item">
                     <div class="icon">🫘</div>
                     <div class="details">
@@ -262,30 +268,6 @@
                     <button class="btn buy" onclick="game.handleInput('BUY PLANT')">Buy</button>
                 </div>
                 <div class="shop-item">
-                    <div class="icon">⚙️</div>
-                    <div class="details">
-                        <h3>Fast Grinder</h3>
-                        <p>Instant grind. $50</p>
-                    </div>
-                    <button class="btn buy" onclick="game.handleInput('BUY UPGRADE_GRINDER')">Buy</button>
-                </div>
-                <div class="shop-item">
-                    <div class="icon">🍵</div>
-                    <div class="details">
-                        <h3>Matcha Set</h3>
-                        <p>Ceremony Kit. $100</p>
-                    </div>
-                    <button class="btn buy" onclick="game.handleInput('BUY UPGRADE_MATCHA')">Buy</button>
-                </div>
-                <div class="shop-item">
-                    <div class="icon">☕️</div>
-                    <div class="details">
-                        <h3>Espresso Machine</h3>
-                        <p>Pro Gear. $250</p>
-                    </div>
-                    <button class="btn buy" onclick="game.handleInput('BUY UPGRADE_ESPRESSO')">Buy</button>
-                </div>
-                <div class="shop-item">
                     <div class="icon">🍃</div>
                     <div class="details">
                         <h3>Matcha Powder</h3>
@@ -310,6 +292,11 @@
                     <button class="btn buy" onclick="game.handleInput('BUY FILTERS 50')">Buy</button>
                 </div>
             </div>
+
+            <div id="shop-upgrades" class="shop-items hidden">
+                <!-- Populated by JS -->
+            </div>
+
             <button class="btn nav back-btn" onclick="game.switchScreen('map')">Back to Map</button>
         </div>
 
