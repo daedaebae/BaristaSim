@@ -116,9 +116,37 @@ body.dark-mode .hud-horizontal {
 }
 
 .hud-icon {
-    font-size: 1.3rem;
-    line-height: 1;
-    filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.2));
+    width: 32px;
+    height: 32px;
+    display: inline-block;
+    background-image: url('../assets/hud_icons.png');
+    background-repeat: no-repeat;
+    background-size: 160px 32px;
+    /* 5 icons * 32px */
+    image-rendering: pixelated;
+    filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.3));
+    transform: scale(1.2);
+    /* Make them slightly larger as requested */
+}
+
+.icon-player {
+    background-position: 0 0;
+}
+
+.icon-clock {
+    background-position: -32px 0;
+}
+
+.icon-cash {
+    background-position: -64px 0;
+}
+
+.icon-rep {
+    background-position: -96px 0;
+}
+
+.icon-pantry {
+    background-position: -128px 0;
 }
 
 .weather-icon {
@@ -132,6 +160,36 @@ body.dark-mode .hud-horizontal {
     /* Neutral gray background to hide grid */
     padding: 2px;
     box-sizing: border-box;
+}
+
+@keyframes spin-slow {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes bob {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-5px);
+    }
+}
+
+.weather-icon.sunny {
+    animation: spin-slow 20s linear infinite;
+}
+
+.weather-icon.rainy {
+    animation: bob 2s ease-in-out infinite;
 }
 
 .weather-icon:hover {
@@ -1159,7 +1217,46 @@ body.dark-mode .dialogue-box {
     border-color: var(--highlight-color);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3),
         0 0 20px rgba(210, 180, 140, 0.3);
+    background-image: url('../assets/customer_avatars.png');
+    background-repeat: no-repeat;
+    background-size: 600% 100%;
+    /* 6 avatars */
+    background-position: 0 0;
+    /* Default */
+    image-rendering: pixelated;
 }
+
+/* Customer Sprite Positions */
+.customer-0 {
+    background-position: 0% 0;
+}
+
+/* Default */
+.customer-1 {
+    background-position: 20% 0;
+}
+
+/* Student */
+.customer-2 {
+    background-position: 40% 0;
+}
+
+/* Hipster */
+.customer-3 {
+    background-position: 60% 0;
+}
+
+/* Tourist */
+.customer-4 {
+    background-position: 80% 0;
+}
+
+/* Regular */
+.customer-5 {
+    background-position: 100% 0;
+}
+
+/* Critic */
 
 .avatar.barista {
     transform: translateX(-20px);
