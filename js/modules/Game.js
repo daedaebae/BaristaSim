@@ -32,11 +32,7 @@ export class Game {
                 reputation: 0
             },
             weather: 'sunny', // sunny, rainy
-            upgrades: {
-                fastGrinder: false,
-                espressoMachine: false,
-                matchaSet: false // New upgrade
-            },
+            upgrades: [], // List of purchased upgrade IDs
             unlockedLocations: ['cart'],
             darkModeUnlocked: false, // Dark mode unlock state
             darkModeEnabled: false, // Dark mode toggle state
@@ -100,10 +96,113 @@ export class Game {
         }
 
         // Initialize the game (show name modal or load saved game)
+        this.upgradeDefinitions = {
+            'grinder_fast': { name: 'Fast Grinder', cost: 50, rep: 0, description: 'Grind beans instantly.', type: 'passive' },
+            'mode_matcha': { name: 'Matcha Kit', cost: 100, rep: 10, description: 'Unlock Matcha brewing mode.', type: 'mode', modeId: 'matcha' },
+            'mode_espresso': { name: 'Espresso Machine', cost: 250, rep: 25, description: 'Unlock Espresso brewing mode.', type: 'mode', modeId: 'espresso' }
+        };
+
         this.init();
 
         // Setup customer portrait touch/click handlers
         this.setupCustomerPortraitTouch();
+    }
+
+    switchShopTab(tabName) {
+        // Update tab buttons
+        const tabs = document.querySelectorAll('.tab-btn');
+        tabs.forEach(btn => {
+            if (btn.textContent.toLowerCase() === tabName) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+
+        // Show/Hide containers
+        const supplies = document.getElementById('shop-supplies');
+        const upgrades = document.getElementById('shop-upgrades');
+
+        if (tabName === 'supplies') {
+            supplies.classList.remove('hidden');
+            upgrades.classList.add('hidden');
+        } else {
+            supplies.classList.add('hidden');
+            upgrades.classList.remove('hidden');
+            this.renderUpgrades();
+        }
+    }
+
+    renderUpgrades() {
+        const container = document.getElementById('shop-upgrades');
+        container.innerHTML = '';
+
+        Object.entries(this.upgradeDefinitions).forEach(([id, upgrade]) => {
+            const isOwned = this.state.upgrades.includes(id);
+            const canAfford = this.state.cash >= upgrade.cost;
+            const hasRep = this.state.stats.reputation >= upgrade.rep;
+            const isLocked = !hasRep;
+
+            const el = document.createElement('div');
+            el.className = `shop-item ${isOwned ? 'owned' : ''} ${isLocked ? 'locked' : ''}`;
+
+            let icon = '⚙️';
+            if (upgrade.type === 'mode') icon = '✨';
+
+            el.innerHTML = `
+                <div class="icon">${icon}</div>
+                <div class="details">
+                    <h3>${upgrade.name}</h3>
+                    <p>${upgrade.description}</p>
+                    <p class="cost">
+                        ${isOwned ? 'Purchased' : `$${upgrade.cost} • ${upgrade.rep} Rep`}
+                    </p>
+                </div>
+                <button class="btn buy" 
+                    onclick="game.buyUpgrade('${id}')"
+                    ${isOwned || isLocked ? 'disabled' : ''}>
+                    ${isOwned ? 'Owned' : (isLocked ? 'Locked' : 'Buy')}
+                </button>
+            `;
+            container.appendChild(el);
+        });
+    }
+
+    buyUpgrade(id) {
+        const upgrade = this.upgradeDefinitions[id];
+        if (!upgrade) return;
+
+        if (this.state.upgrades.includes(id)) {
+            this.log("You already own this upgrade.", 'neutral');
+            return;
+        }
+
+        if (this.state.cash < upgrade.cost) {
+            this.log(`Need $${upgrade.cost.toFixed(2)}`, 'error');
+            this.audio.playError();
+            return;
+        }
+
+        if (this.state.stats.reputation < upgrade.rep) {
+            this.log(`Need ${upgrade.rep} Reputation`, 'error');
+            this.audio.playError();
+            return;
+        }
+
+        // Purchase successful
+        this.state.cash -= upgrade.cost;
+        this.state.upgrades.push(id);
+        this.updateHUD();
+        this.audio.playAction();
+        this.log(`Purchased ${upgrade.name}!`, 'success');
+
+        // Apply effects
+        if (upgrade.type === 'mode') {
+            // Unlock mode logic will go here or be checked dynamically
+            this.log(`Unlocked ${upgrade.name} mode!`, 'success');
+        }
+
+        this.renderUpgrades(); // Refresh UI
     }
 
     consumeResource(resource, amount) {
@@ -236,6 +335,20 @@ export class Game {
                 const saveData = JSON.parse(saveString);
                 // Merge saved state with default state to handle new fields
                 this.state = { ...this.state, ...saveData.state };
+
+                // Migration: Convert object-based upgrades to array
+                if (this.state.upgrades && !Array.isArray(this.state.upgrades)) {
+                    console.log("Migrating upgrades from object to array...");
+                    const newUpgrades = [];
+                    // Map old keys to new keys if necessary, or just use keys
+                    // Old keys: fastGrinder, espressoMachine, matchaSet
+                    // New keys: grinder_fast, mode_espresso, mode_matcha
+                    if (this.state.upgrades.fastGrinder) newUpgrades.push('grinder_fast');
+                    if (this.state.upgrades.espressoMachine) newUpgrades.push('mode_espresso');
+                    if (this.state.upgrades.matchaSet) newUpgrades.push('mode_matcha');
+
+                    this.state.upgrades = newUpgrades;
+                }
 
                 // Restore complex objects if needed (e.g., Date objects, though we use simple numbers)
                 this.log("Welcome back! Game loaded.", 'system');
@@ -1111,6 +1224,10 @@ export class Game {
         if (!silent) {
             this.audio.playAction(); // Click sound
         }
+
+        if (screenName === 'shop') {
+            this.renderUpgrades();
+        }
     }
 
     getPatienceLevel(p) {
@@ -1248,7 +1365,7 @@ export class Game {
         // Mode Switching
         if (cmd === 'SWITCH_MODE') {
             const modes = ['coffee', 'matcha'];
-            if (this.state.upgrades.espressoMachine) modes.push('espresso');
+            if (this.state.upgrades.includes('mode_espresso')) modes.push('espresso');
 
             let currentIdx = modes.indexOf(mode);
             let nextMode = modes[(currentIdx + 1) % modes.length];
@@ -1403,7 +1520,7 @@ export class Game {
                 this.updateBrewingVisuals();
 
                 // Fast grinder upgrade check
-                if (this.state.upgrades.fastGrinder) this.log("Fast grinder goes brrr!", 'system');
+                if (this.state.upgrades.includes('grinder_fast')) this.log("Fast grinder goes brrr!", 'system');
                 break;
 
             case 'ADD_WATER':
@@ -1598,15 +1715,12 @@ export class Game {
             'BEANS_PRM': { key: 'beans_premium', cost: 0.10, name: 'Prm Beans' }, // $0.10 per gram
             'MILK': { key: 'milk', cost: 0.02, name: 'Milk' }, // $0.02 per ml
             'MILK_OAT': { key: 'milk_oat', cost: 0.06, name: 'Oat-Milk' }, // $0.02 per ml
-            'WATER': { key: 'water', cost: 0.004, name: 'Water' }, // $0.004 per ml ($2 for 500ml)
+            'WATER': { key: 'water', cost: 0.004, name: 'Water' }, // $2 for 500ml
             'MATCHA_STD': { key: 'matcha_powder', cost: 0.20, name: 'Matcha Powder' }, // $0.20 per gram,
             'MATCHA_PRM': { key: 'matcha_powder', cost: 0.35, name: 'Matcha Powder' }, // $0.35 per gram
             'CUPS': { key: 'cups', cost: 1.50, name: 'Paper Cups' }, // $1.50 per cup
             'FILTERS': { key: 'filters', cost: 0.05, name: 'Paper Filters' }, // $0.05 per filter
-            'PLANT': { key: 'plant', cost: 20.00, name: 'Potted Plant', type: 'decoration' },
-            'UPGRADE_GRINDER': { key: 'fastGrinder', cost: 50.00, name: 'Fast Grinder', type: 'upgrade' },
-            'UPGRADE_MATCHA': { key: 'matchaSet', cost: 200.00, name: 'Matcha Set', type: 'upgrade', minEarnings: 300, minRep: 5 },
-            'UPGRADE_ESPRESSO': { key: 'espressoMachine', cost: 500.00, name: 'Espresso Machine', type: 'upgrade', minEarnings: 1000, minRep: 15 }
+            'PLANT': { key: 'plant', cost: 20.00, name: 'Potted Plant', type: 'decoration' }
         };
 
         const itemKey = args[1];
@@ -1617,21 +1731,6 @@ export class Game {
         const item = itemMap[itemKey];
         const totalCost = item.cost * quantity;
 
-        // Check upgrade requirements
-        if (item.type === 'upgrade') {
-            if (item.minEarnings && this.state.stats.cumulativeEarnings < item.minEarnings) {
-                const needed = item.minEarnings - this.state.stats.cumulativeEarnings;
-                this.log(`${item.name} unlocks after earning $${needed.toFixed(2)} more (total: $${item.minEarnings})`, 'error');
-                this.audio.playError();
-                return;
-            }
-            if (item.minRep && this.state.stats.reputation < item.minRep) {
-                this.log(`${item.name} requires ${item.minRep} reputation (you have ${this.state.stats.reputation})`, 'error');
-                this.audio.playError();
-                return;
-            }
-        }
-
         if (this.state.cash >= totalCost) {
             this.state.cash -= totalCost;
 
@@ -1639,9 +1738,6 @@ export class Game {
                 this.state.decorations.push(item.key);
                 this.renderDecorations();
                 this.log(`Bought a ${item.name}! Cozy vibes increased.`, 'success');
-            } else if (item.type === 'upgrade') {
-                this.state.upgrades[item.key] = true;
-                this.log(`Upgraded to ${item.name}!`, 'success');
             } else {
                 this.state.inventory[item.key] += quantity;
                 this.log(`Bought ${quantity} ${item.name}`, 'success');
@@ -1838,10 +1934,10 @@ export class Game {
 
             let order = 'Coffee';
             // Order Logic
-            if (this.state.upgrades.matchaSet && (specialType === 'hipster' || Math.random() < 0.3)) {
-                order = 'Matcha Latte';
-                patience += 20;
-            } else if (this.state.upgrades.espressoMachine && Math.random() < 0.3) {
+            if (this.state.upgrades.includes('mode_matcha') && (specialType === 'hipster' || Math.random() < 0.3)) {
+                this.state.currentCustomer.order = { type: 'matcha', name: 'Matcha Latte' };
+                this.log(`${this.state.currentCustomer.name} wants a Matcha Latte.`, 'neutral');
+            } else if (this.state.upgrades.includes('mode_espresso') && Math.random() < 0.3) {
                 order = 'Espresso'; // Simplification, could be Latte/Cappuccino
             }
 

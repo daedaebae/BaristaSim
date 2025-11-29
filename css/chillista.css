@@ -119,32 +119,36 @@ body.dark-mode .hud-horizontal {
     width: 32px;
     height: 32px;
     display: inline-block;
-    background-image: url('../assets/hud_icons.png');
     background-repeat: no-repeat;
-    background-size: 500% 100%;
+    background-size: contain;
     image-rendering: pixelated;
     filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.3));
     transform: scale(1.2);
 }
 
 .icon-player {
-    background-position: 0% 0;
+    background-image: url('../assets/icon_player.png');
+    background-position: center;
 }
 
 .icon-clock {
-    background-position: 25% 0;
+    background-image: url('../assets/icon_clock.png');
+    background-position: center;
 }
 
 .icon-cash {
-    background-position: 50% 0;
+    background-image: url('../assets/icon_cash.png');
+    background-position: center;
 }
 
 .icon-rep {
-    background-position: 75% 0;
+    background-image: url('../assets/icon_rep.png');
+    background-position: center;
 }
 
 .icon-pantry {
-    background-position: 100% 0;
+    background-image: url('../assets/icon_pantry.png');
+    background-position: center;
 }
 
 .weather-icon {
@@ -789,12 +793,68 @@ body.dark-mode #screen-shop {
     padding-bottom: 1rem;
 }
 
+/* Shop Tabs */
+.shop-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.tab-btn {
+    background: var(--bg-color-secondary);
+    border: 2px solid var(--border-color);
+    color: var(--text-color);
+    padding: 0.5rem 1rem;
+    font-family: var(--font-ui);
+    font-size: 1.2rem;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.tab-btn:hover {
+    background: var(--bg-color-hover);
+    transform: translateY(-2px);
+}
+
+.tab-btn.active {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color-dark);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Shop Items - Upgrades */
+.shop-item.locked {
+    opacity: 0.6;
+    filter: grayscale(0.8);
+    pointer-events: none;
+}
+
+.shop-item.owned {
+    border-color: var(--success-color);
+    background: rgba(46, 204, 113, 0.1);
+}
+
+.shop-item.owned .btn {
+    background: var(--success-color);
+    cursor: default;
+}
+
+.shop-item .details .cost {
+    font-weight: bold;
+    color: var(--primary-color);
+    margin-top: 0.2rem;
+}
+
 .shop-items {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+    padding: 1rem;
     overflow-y: auto;
+    max-height: 60vh;
 }
 
 .shop-item {
@@ -1006,7 +1066,7 @@ body.dark-mode .dialogue-box {
 
 .dialogue-continue {
     align-self: flex-end;
-    animation: blink 1s infinite;
+
     font-size: 1rem;
 }
 
@@ -1035,17 +1095,7 @@ body.dark-mode .dialogue-box {
     transform: translateY(-2px);
 }
 
-@keyframes blink {
 
-    0%,
-    100% {
-        opacity: 1;
-    }
-
-    50% {
-        opacity: 0;
-    }
-}
 
 /* Weather Overlay */
 .weather-overlay {
@@ -1464,6 +1514,8 @@ body.dark-mode .dialogue-box {
         opacity: 0.9;
     }
 }
+
+
 
 /* Customer Wrapper for hover positioning */
 .customer-wrapper {
