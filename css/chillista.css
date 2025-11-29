@@ -499,9 +499,9 @@ body.dark-mode .controls-area {
 }
 
 #coffee-controls {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    /* 5 columns to fit Serve button on the first row */
     gap: 0.8rem;
 }
 
