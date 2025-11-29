@@ -149,42 +149,8 @@ Chillista is a chill, lo-fi coffee cart simulation game where players manage a m
 
 ## Planned Features & Improvements
 
-### Immediate Priorities (In Progress)
 
-#### Resource Management Enhancements
-- **Usage Tracking Per Customer**: Track exact resource usage per customer served
-- **Low Stock Warnings**: Enhanced visual and audio warnings
-- **Smart Shopping Suggestions**: 
-  - Calculate average daily usage
-  - Suggest restock quantities based on projected needs
-  - Warn about critical shortages
-
-#### Pantry UI Improvements
-- **Enhanced Visual Layout**: 
-  - Better organization of inventory items
-  - Visual indicators for resource levels
-  - Color-coded warnings (green/yellow/red)
-- **Usage Statistics**: 
-  - Show daily/weekly usage trends
-  - Display average consumption per customer
-  - Projected days until out of stock
-- **Quick Restock Options**: 
-  - One-click restock buttons for common items
-  - Bulk purchase options
-  - Shopping list integration
-
-#### Conversation System Enhancements
-- **Satisfaction Meter**: ✅ Implemented (0-100 scale with emoji indicators)
-- **Context-Aware Dialogue**: 
-  - Dialogue options change based on customer satisfaction
-  - Weather-aware conversation starters
-  - Location-specific dialogue (park vs cart)
-- **Feedback on Dialogue Choices**: 
-  - Visual feedback when choices affect satisfaction
-  - Show reputation/patience changes more clearly
-  - Customer reactions to dialogue choices
-
-### Future Features
+### Immediate Priorities (Phase 3)
 
 #### Recipe Expansion
 - **Latte Art**: Visual quality indicator for espresso drinks
