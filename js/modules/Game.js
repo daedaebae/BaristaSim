@@ -44,6 +44,15 @@ export class Game {
             unlockedLocations: ['cart'],
             darkModeUnlocked: false, // Dark mode unlock state
             darkModeEnabled: false, // Dark mode toggle state
+            debug: {
+                enabled: false,
+                weatherDisabled: false,
+                customerArrivalDisabled: false,
+                timePaused: false,
+                infiniteResources: false,
+                timeSpeed: 1 // 1x, 2x, 5x, or 10x
+            },
+            gameStarted: false // Block input until intro is closed
             settings: {
                 uiScale: 100,
                 musicVolume: 30,
@@ -132,6 +141,57 @@ export class Game {
 
         // Initial check
         this.checkModeUnlock();
+        this.setupTooltips();
+    }
+
+    setupTooltips() {
+        const tooltip = document.getElementById('custom-tooltip');
+        if (!tooltip) return;
+
+        document.addEventListener('mouseover', (e) => {
+            const target = e.target.closest('[data-tooltip]');
+            if (target) {
+                const text = target.getAttribute('data-tooltip');
+                tooltip.textContent = text;
+                tooltip.classList.remove('hidden');
+
+                // Position initially
+                this.updateTooltipPosition(e, tooltip);
+            }
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!tooltip.classList.contains('hidden')) {
+                this.updateTooltipPosition(e, tooltip);
+            }
+        });
+
+        document.addEventListener('mouseout', (e) => {
+            const target = e.target.closest('[data-tooltip]');
+            if (target) {
+                tooltip.classList.add('hidden');
+            }
+        });
+    }
+
+    updateTooltipPosition(e, tooltip) {
+        const x = e.clientX;
+        const y = e.clientY;
+
+        // Keep within bounds
+        const rect = tooltip.getBoundingClientRect();
+        let left = x + 15;
+        let top = y + 15;
+
+        if (left + rect.width > window.innerWidth) {
+            left = x - rect.width - 10;
+        }
+        if (top + rect.height > window.innerHeight) {
+            top = y - rect.height - 10;
+        }
+
+        tooltip.style.left = `${left}px`;
+        tooltip.style.top = `${top}px`;
     }
 
     checkModeUnlock() {
@@ -407,31 +467,7 @@ export class Game {
         this.closeModeMenu();
     }
 
-    updateBrewingVisuals() {
-        const { mode, step } = this.state.brewingState;
 
-        // Hide all stations first
-        if (this.ui.brewingStation) this.ui.brewingStation.classList.add('hidden');
-        if (this.ui.matchaStation) this.ui.matchaStation.classList.add('hidden');
-        if (this.ui.espressoStation) this.ui.espressoStation.classList.add('hidden');
-
-        // Show active station
-        let activeStation;
-        if (mode === 'coffee') activeStation = this.ui.brewingStation;
-        if (mode === 'matcha') activeStation = this.ui.matchaStation;
-        if (mode === 'espresso') activeStation = this.ui.espressoStation;
-
-        if (activeStation) {
-            activeStation.classList.remove('hidden');
-
-            // Update contents based on step (simplified for now)
-            const contents = activeStation.querySelector('.contents');
-            if (contents) {
-                contents.className = 'contents'; // Reset
-                if (step > 0) contents.classList.add('step-' + step);
-            }
-        }
-    }
 
     switchShopTab(tabName) {
         // Update tab buttons
@@ -553,7 +589,9 @@ export class Game {
                 e.stopPropagation();
                 const panel = this.ui.customerInfoPanel;
                 if (panel && this.state.currentCustomer) {
-                    // Toggle on mobile, show on hover for desktop
+                    // MOBILE INTERACTION:
+                    // On touch devices (where hover isn't available), clicking the portrait
+                    // toggles the customer info panel. On desktop, it shows on hover (handled by CSS).
                     if (window.matchMedia('(hover: none) and (pointer: coarse)').matches) {
                         // Mobile device - toggle panel
                         panel.classList.toggle('show-on-touch');
@@ -696,7 +734,28 @@ export class Game {
             nameModal.classList.add('hidden');
         }
 
-        // Show Intro Modal
+        // Check for existing save
+        if (localStorage.getItem('baristaSimSave')) {
+            console.log("Found save file, skipping intro...");
+            if (this.loadGame()) {
+                this.state.gameStarted = true;
+
+                // Show HUD buttons
+                const musicToggle = document.getElementById('music-toggle');
+                const mapToggle = document.getElementById('map-toggle');
+                if (musicToggle) musicToggle.classList.remove('hidden');
+                if (mapToggle) mapToggle.classList.remove('hidden');
+
+                this.startGame(false);
+
+                // Ensure intro modal is hidden
+                const introModal = document.getElementById('intro-modal');
+                if (introModal) introModal.classList.add('hidden');
+                return;
+            }
+        }
+
+        // Show Intro Modal if no save or load failed
         const introModal = document.getElementById('intro-modal');
         if (introModal) {
             introModal.classList.remove('hidden');
@@ -739,6 +798,14 @@ export class Game {
         }
     }
 
+    startNewGameFlow() {
+        // Show intro modal explicitly
+        const introModal = document.getElementById('intro-modal');
+        if (introModal) {
+            introModal.classList.remove('hidden');
+        }
+    }
+
     closeIntro() {
         const introModal = document.getElementById('intro-modal');
         if (introModal) {
@@ -758,20 +825,28 @@ export class Game {
                 }
             }
         }
-        this.startFlow();
+
+        // Show HUD buttons
+        const musicToggle = document.getElementById('music-toggle');
+        const mapToggle = document.getElementById('map-toggle');
+        if (musicToggle) musicToggle.classList.remove('hidden');
+        if (mapToggle) mapToggle.classList.remove('hidden');
+
+        this.state.gameStarted = true; // Unblock input
+
+        // Show name entry when intro is closed
+        this.showNameModal();
     }
 
-    startFlow() {
-        // Try to load game first
-        if (this.loadGame()) {
-            // Saved game found - skip name entry and start directly
-            this.startGame(false); // false = loaded game, don't randomize weather
-        } else {
-            // New game flow - show name entry
-            const nameModal = document.getElementById('name-modal');
-            if (nameModal) {
-                nameModal.classList.remove('hidden');
-            }
+    showNameModal() {
+        const nameModal = document.getElementById('name-modal');
+        if (nameModal) {
+            nameModal.classList.remove('hidden');
+            // Focus input
+            setTimeout(() => {
+                const input = document.getElementById('player-name-input');
+                if (input) input.focus();
+            }, 100);
         }
     }
 
@@ -1135,6 +1210,8 @@ export class Game {
     }
 
     toggleMenu() {
+        // Allow settings to be accessed before game starts
+        // if (!this.state.gameStarted) return; 
         const menu = document.getElementById('menu-overlay');
         const isOpening = menu.classList.contains('hidden');
         menu.classList.toggle('hidden');
@@ -1154,6 +1231,7 @@ export class Game {
     }
 
     toggleDebugMenu() {
+        if (!this.state.gameStarted) return;
         const debugMenu = document.getElementById('debug-menu-overlay');
         const isOpening = debugMenu.classList.contains('hidden');
         debugMenu.classList.toggle('hidden');
@@ -1334,6 +1412,7 @@ export class Game {
     }
 
     toggleShop() {
+        if (!this.state.gameStarted) return;
         const shop = document.getElementById('screen-shop');
         if (!shop) return;
 
@@ -1359,6 +1438,7 @@ export class Game {
     }
 
     toggleDarkMode() {
+        if (!this.state.gameStarted) return;
         if (!this.state.darkModeUnlocked) {
             this.log("🔒 Dark mode locked. Serve 3 customers to unlock!", 'error');
             this.audio.playError();
@@ -1693,50 +1773,12 @@ export class Game {
         }
     }
 
-    updateBrewingVisuals() {
-        const mode = this.state.brewingState.mode;
-        const step = this.state.brewingState.step;
 
-        // Hide all controls first
-        const coffeeControls = document.getElementById('coffee-controls');
-        const matchaControls = document.getElementById('matcha-controls');
-        const espressoControls = document.getElementById('espresso-controls');
-
-        if (coffeeControls) coffeeControls.classList.add('hidden');
-        if (matchaControls) matchaControls.classList.add('hidden');
-        if (espressoControls) espressoControls.classList.add('hidden');
-
-        // Get Serve Buttons
-        const btnServeCoffee = document.getElementById('btn-serve-coffee');
-        const btnServeMatcha = document.getElementById('btn-serve-matcha');
-        const btnServeEspresso = document.getElementById('btn-serve-espresso');
-
-        // Reset Serve Buttons (Always visible, but maybe styled differently if we wanted,
-        // but for now we just ensure they are NOT hidden)
-        if (btnServeCoffee) btnServeCoffee.classList.remove('hidden', 'disabled');
-        if (btnServeMatcha) btnServeMatcha.classList.remove('hidden', 'disabled');
-        if (btnServeEspresso) btnServeEspresso.classList.remove('hidden', 'disabled');
-
-        const classes = ['state-idle', 'state-ground', 'state-water', 'state-stirred', 'state-plunged'];
-
-        if (mode === 'matcha') {
-            matchaControls.classList.remove('hidden');
-            this.ui.brewingStation.className = `brewing-station matcha-mode step-${step}`;
-        } else if (mode === 'espresso') {
-            espressoControls.classList.remove('hidden');
-            this.ui.brewingStation.className = `brewing-station espresso-mode step-${step}`;
-        } else {
-            coffeeControls.classList.remove('hidden');
-            this.ui.brewingStation.className = `brewing-station ${classes[step]}`;
-        }
-
-        // Update park station if it exists
-        if (this.ui.parkBrewingStation) {
-            this.ui.parkBrewingStation.className = this.ui.brewingStation.className;
-        }
-    }
 
     handleInput(commandStr) {
+        console.log(`handleInput: ${commandStr}, gameStarted: ${this.state.gameStarted}`);
+        if (!this.state.gameStarted) return; // Block input
+
         const cmdParts = commandStr.trim().toUpperCase().split(' ');
         const cmd = cmdParts[0];
 
@@ -1783,6 +1825,7 @@ export class Game {
     }
 
     handleBrewCommand(cmd, args) {
+        console.log(`handleBrewCommand: ${cmd}, mode: ${this.state.brewingState.mode}, step: ${this.state.brewingState.step}`);
         if (!this.state.currentCustomer) {
             this.log("Relax... wait for a guest.", 'error');
             this.audio.playError();
@@ -1939,6 +1982,7 @@ export class Game {
             case 'SWITCH_MODE':
                 this.openModeMenu();
                 break;
+            case 'GRIND':
             case 'GRIND_BEANS':
                 // Removed strict step check
                 if (!this.consumeResource('beans_standard', 20)) {
@@ -2083,56 +2127,96 @@ export class Game {
     }
 
     updateBrewingVisuals() {
-        const step = this.state.brewingState.step;
-        const mode = this.state.brewingState.mode;
-        const classes = ['state-empty', 'state-ground', 'state-water', 'state-stirred', 'state-plunged'];
+        const { mode, step } = this.state.brewingState;
 
-        // Toggle Controls
+        // 1. Station Visibility
+        if (this.ui.brewingStation) this.ui.brewingStation.classList.add('hidden');
+        if (this.ui.matchaStation) this.ui.matchaStation.classList.add('hidden');
+        if (this.ui.espressoStation) this.ui.espressoStation.classList.add('hidden');
+
+        let activeStation;
+        if (mode === 'coffee') activeStation = this.ui.brewingStation;
+        else if (mode === 'matcha') activeStation = this.ui.matchaStation;
+        else if (mode === 'espresso') activeStation = this.ui.espressoStation;
+
+        if (activeStation) activeStation.classList.remove('hidden');
+
+        // 2. Controls Visibility
         const coffeeControls = document.getElementById('coffee-controls');
         const matchaControls = document.getElementById('matcha-controls');
         const espressoControls = document.getElementById('espresso-controls');
 
+        if (coffeeControls) coffeeControls.classList.add('hidden');
+        if (matchaControls) matchaControls.classList.add('hidden');
+        if (espressoControls) espressoControls.classList.add('hidden');
+
+        if (mode === 'coffee' && coffeeControls) coffeeControls.classList.remove('hidden');
+        if (mode === 'matcha' && matchaControls) matchaControls.classList.remove('hidden');
+        if (mode === 'espresso' && espressoControls) espressoControls.classList.remove('hidden');
+
+        // 3. Serve Buttons
         const btnServeCoffee = document.getElementById('btn-serve-coffee');
         const btnServeMatcha = document.getElementById('btn-serve-matcha');
         const btnServeEspresso = document.getElementById('btn-serve-espresso');
 
-        coffeeControls.classList.add('hidden');
-        matchaControls.classList.add('hidden');
-        espressoControls.classList.add('hidden');
-
-        // Helper to toggle disabled state
         const setServeButtonState = (btn, enabled) => {
             if (!btn) return;
-            btn.classList.remove('hidden'); // Always visible
-            if (enabled) {
-                btn.classList.remove('disabled');
-            } else {
-                btn.classList.add('disabled');
-            }
+            btn.classList.remove('hidden');
+            if (enabled) btn.classList.remove('disabled');
+            else btn.classList.add('disabled');
         };
 
-        // Reset all to disabled first
-        setServeButtonState(btnServeCoffee, false);
-        setServeButtonState(btnServeMatcha, false);
-        setServeButtonState(btnServeEspresso, false);
+        setServeButtonState(btnServeCoffee, mode === 'coffee' && step === 4);
+        setServeButtonState(btnServeMatcha, mode === 'matcha' && step === 3);
+        setServeButtonState(btnServeEspresso, mode === 'espresso' && step === 5);
 
-        if (mode === 'matcha') {
-            matchaControls.classList.remove('hidden');
-            this.ui.brewingStation.className = `brewing-station matcha-mode step-${step}`;
-            setServeButtonState(btnServeMatcha, step === 3);
-        } else if (mode === 'espresso') {
-            espressoControls.classList.remove('hidden');
-            this.ui.brewingStation.className = `brewing-station espresso-mode step-${step}`;
-            setServeButtonState(btnServeEspresso, step === 5);
-        } else {
-            coffeeControls.classList.remove('hidden');
-            this.ui.brewingStation.className = `brewing-station ${classes[step]}`;
-            setServeButtonState(btnServeCoffee, step === 4);
+        // 4. Animations & Classes
+        // Reset animations
+        document.querySelectorAll('.pouring, .grinding, .whisking, .filling').forEach(el => {
+            el.classList.remove('pouring', 'grinding', 'whisking', 'filling');
+        });
+
+        // Reset hidden states for items
+        if (activeStation) {
+            activeStation.querySelectorAll('div').forEach(el => {
+                if (!el.classList.contains('contents') && !el.classList.contains('chamber') && !el.classList.contains('plunger') && !el.classList.contains('bowl') && !el.classList.contains('espresso-machine')) {
+                    el.classList.remove('hidden');
+                }
+            });
         }
 
-        // Update park station if it exists
-        if (this.ui.parkBrewingStation) {
-            this.ui.parkBrewingStation.className = this.ui.brewingStation.className;
+        if (mode === 'coffee') {
+            // Aeropress
+            if (step === 1) { // Grind
+                const grinder = activeStation.querySelector('.hand-grinder');
+                if (grinder) grinder.classList.add('grinding');
+            }
+            if (step === 2) { // Add Water
+                const kettle = activeStation.querySelector('.kettle');
+                if (kettle) kettle.classList.add('pouring');
+            }
+        } else if (mode === 'matcha') {
+            if (step === 1) { // Sift
+                const powder = activeStation.querySelector('.tea-powder');
+                if (powder) powder.classList.add('grinding');
+            }
+            if (step === 2) { // Add Water
+                const kettle = activeStation.querySelector('.kettle');
+                if (kettle) kettle.classList.add('pouring');
+            }
+            if (step === 3) { // Whisk
+                const whisk = activeStation.querySelector('.whisk');
+                if (whisk) whisk.classList.add('whisking');
+            }
+        } else if (mode === 'espresso') {
+            if (step === 1) { // Grind
+                const grinder = activeStation.querySelector('.electric-grinder');
+                if (grinder) grinder.classList.add('grinding');
+            }
+            if (step === 3) { // Pull Shot
+                const cup = activeStation.querySelector('.cup');
+                if (cup) cup.classList.add('filling');
+            }
         }
     }
     handleBuyCommand(args) {
@@ -2507,6 +2591,10 @@ export class Game {
 
             // Remove all old status classes
             el.classList.remove('resource-low', 'resource-critical', 'resource-warning');
+
+            // Skip checks for locked items
+            if (resource === 'matcha_powder' && !this.state.upgrades.includes('matcha_kit')) continue;
+            if (resource === 'beans_premium' && !this.state.upgrades.includes('espresso_kit')) continue;
 
             if (amount === 0) {
                 el.classList.add('resource-critical');
