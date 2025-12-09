@@ -20,7 +20,7 @@ const WikiModal = ({ isOpen, onClose }) => {
         try {
             // Clean up path to ensure we're fetching relative to Wiki root
             const cleanPath = path.replace(/^\.\//, ''); // Remove leading ./
-            const response = await fetch(`/Wiki/${cleanPath}`);
+            const response = await fetch(`${import.meta.env.BASE_URL}Wiki/${cleanPath}`);
 
             if (!response.ok) throw new Error('Failed to load page');
 

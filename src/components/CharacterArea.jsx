@@ -1,9 +1,8 @@
-import React from 'react';
-// The legacy used pixel_barista, check file list. list_dir showed pixel_barista.png and pixel_barista2.png
+import pixelBarista from '../assets/characters/pixel_barista.png';
 
 export default function CharacterArea({ currentCustomer, minutesElapsed }) {
     // Current Barista Avatar (can be dynamic later)
-    const baristaAvatar = "/assets/pixel_barista.png"; // Fixed asset for now
+    const baristaAvatar = pixelBarista;
 
     // Calculate wait time
     const waitTime = currentCustomer ? (minutesElapsed - currentCustomer.arrivalTime) : 0;
@@ -23,20 +22,27 @@ export default function CharacterArea({ currentCustomer, minutesElapsed }) {
                     />
 
                     {/* Wait Timer Overlay */}
-                    <div className="wait-timer" style={{
+                    <div className={`wait-timer ${currentCustomer.patience < 2 ? 'blink-urgent' : ''}`} style={{
                         position: 'absolute',
                         bottom: '80px',
                         right: '-10px',
                         background: '#fff',
-                        border: '2px solid #5d4037',
+                        border: currentCustomer.patience < 2 ? '2px solid red' : '2px solid #5d4037',
                         borderRadius: '12px',
                         padding: '2px 8px',
                         fontSize: '0.8rem',
                         fontWeight: 'bold',
-                        color: waitTime > 30 ? '#d32f2f' : '#3e2723',
-                        zIndex: 20
+                        color: waitTime > 10 ? '#d32f2f' : (waitTime > 8 ? '#f57f17' : '#3e2723'),
+                        zIndex: 20,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        whiteSpace: 'nowrap',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
                     }}>
-                        ⏱ {waitTime}m
+                        <span style={{ color: '#5d4037' }}>{currentCustomer.name}</span>
+                        <span>|</span>
+                        <span>⏱ {Math.floor(waitTime)}:{(Math.floor((waitTime * 60) % 60)).toString().padStart(2, '0')}</span>
                     </div>
 
                     <div id="customer-info-panel" className="customer-info-panel" style={{

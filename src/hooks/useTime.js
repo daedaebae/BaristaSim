@@ -28,7 +28,7 @@ export const useTime = (initialState) => {
                 const hour = Math.floor(newMinutes / 60) + 5; // Start at 5 AM
                 const ampm = hour >= 12 ? 'PM' : 'AM';
                 const displayHour = hour > 12 ? hour - 12 : hour;
-                const displayMinute = newMinutes % 60;
+                const displayMinute = Math.floor(newMinutes % 60);
                 const timeString = `${displayHour}:${displayMinute.toString().padStart(2, '0')} ${ampm}`;
 
                 const newState = {

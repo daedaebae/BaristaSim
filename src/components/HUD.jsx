@@ -1,21 +1,20 @@
 import Tooltip from './Tooltip';
-import weatherSunny from '../assets/weather_sunny.png';
-import weatherRainy from '../assets/weather_rainy.png';
+import weatherSunny from '../assets/icons-weather/weather_sunny.png';
+import weatherRainy from '../assets/icons-weather/weather_rainy.png';
+import weatherCloudy from '../assets/icons-weather/weather_cloudy.png';
 
 const HUD = ({ gameState, toggleModal }) => {
     const { time, cash, stats, weather, minutesElapsed } = gameState;
 
-    // Calculate display time
-    const totalMinutes = minutesElapsed || 0;
-    let hours = Math.floor(totalMinutes / 60) + 5;
-    const minutes = totalMinutes % 60;
-    const period = hours >= 12 ? 'PM' : 'AM';
-    if (hours === 0) hours = 12;
-    else if (hours > 12) hours -= 12;
-    const timeString = `${hours}:${minutes.toString().padStart(2, '0')} ${period}`;
+    // Use time string from game state (already formatted in useTime)
+    const timeString = time;
 
-    // Icon style for weather only
-    const iconStyle = { width: '32px', height: '32px', marginRight: '5px' };
+    // Weather Icons
+    const weatherIcons = {
+        sunny: weatherSunny,
+        rainy: weatherRainy,
+        cloudy: weatherCloudy
+    };
 
     return (
         <div id="hud" className="hud-horizontal" style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -71,13 +70,15 @@ const HUD = ({ gameState, toggleModal }) => {
                 </div>
             </Tooltip>
 
-            <Tooltip text="Current Weather" placement="bottom">
+            {/* Weather */}
+            <Tooltip text={`Weather: ${weather.charAt(0).toUpperCase() + weather.slice(1)}`} placement="bottom">
                 <div className="hud-item" style={{ display: 'flex', alignItems: 'center' }}>
                     <img
-                        src={weather === 'rainy' ? weatherRainy : weatherSunny}
+                        src={weatherIcons[weather] || weatherIcons.sunny}
                         alt={weather}
-                        style={iconStyle}
+                        style={{ width: '32px', height: '32px', marginRight: '5px', imageRendering: 'pixelated' }}
                     />
+                    <span id="weather-display" style={{ textTransform: 'capitalize' }}>{weather}</span>
                 </div>
             </Tooltip>
         </div>

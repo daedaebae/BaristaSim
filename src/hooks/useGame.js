@@ -7,22 +7,36 @@ import { useBrewing } from './useBrewing.js';
 import { useDialogue } from './useDialogue.js';
 
 export const useGame = () => {
-    // UI State (Still managed here as it's the glue)
+    // Load save synchronously for initial state to prevent flash
+    const savedString = localStorage.getItem('baristaSimSave');
+    const savedGame = savedString ? JSON.parse(savedString) : null;
+
+    // UI State
     const [uiState, setUiState] = useState({
-        activeModal: 'intro',
+        activeModal: savedGame ? null : 'intro', // Skip intro if save exists
         activeScreen: 'cart',
         notifications: [],
         showDebug: false
     });
 
+    const [settings, setSettings] = useState(savedGame ? savedGame.settings : {
+        musicEnabled: true,
+        musicVolume: 50,
+        sfxVolume: 50,
+        ambienceVolume: 40,
+        uiScale: 100,
+        muteAll: false,
+        difficulty: 'cozy'
+    });
+
     const [gameMeta, setGameMeta] = useState({
-        gameStarted: false,
-        playerName: 'Barista',
-        weather: 'sunny',
-        unlockedLocations: ['cart'],
-        darkModeUnlocked: false,
-        darkModeEnabled: false,
-        logs: [],
+        gameStarted: savedGame ? savedGame.gameStarted : false,
+        playerName: savedGame ? savedGame.playerName : 'Barista',
+        weather: savedGame ? savedGame.weather : 'sunny',
+        unlockedLocations: savedGame ? savedGame.unlockedLocations : ['cart'],
+        darkModeUnlocked: savedGame ? savedGame.darkModeUnlocked : false,
+        darkModeEnabled: savedGame ? savedGame.darkModeEnabled : false,
+        logs: savedGame ? (savedGame.logs || []) : [],
         debug: {
             enabled: false,
             weatherDisabled: false,
@@ -34,7 +48,7 @@ export const useGame = () => {
     });
 
     // --- SUB-HOOKS ---
-    const audio = useAudio();
+    const audio = useAudio(savedGame?.settings);
     const time = useTime();
     const inventory = useInventory();
     const customers = useCustomers();
@@ -57,21 +71,38 @@ export const useGame = () => {
 
     // --- ACTIONS ---
 
-    const startGame = useCallback((playerName) => {
-        setGameMeta(prev => ({
-            ...prev,
-            gameStarted: true,
-            playerName: playerName || prev.playerName || 'Barista'
-        }));
-        time.setGameStarted(true);
-        setUiState(prev => ({ ...prev, activeModal: null }));
+    const toggleMuteAll = useCallback((muted) => {
+        setSettings(prev => ({ ...prev, muteAll: muted }));
+    }, []);
 
-        // Start Audio
-        if (audio.audioRef.current && !audio.settings.muteAll) {
-            audio.playMusic();
-            audio.playAmbience('/assets/ambience_shop.mp3');
+    const setDifficulty = useCallback((difficulty) => {
+        setSettings(prev => ({ ...prev, difficulty }));
+    }, []);
+    const startGame = useCallback((playerName) => {
+        try {
+            setGameMeta(prev => ({
+                ...prev,
+                gameStarted: true,
+                playerName: playerName || prev.playerName || 'Barista'
+            }));
+            time.setGameStarted(true);
+            setUiState(prev => ({ ...prev, activeModal: null }));
+
+            // Start Audio
+            if (settings && settings.musicEnabled) {
+                if (audio.context && audio.context.state === 'suspended') {
+                    audio.context.resume().catch(e => console.error("Audio resume failed", e));
+                }
+                audio.playMusic();
+                audio.playAmbience(`${import.meta.env.BASE_URL}assets/ambience/ambience_shop.mp3`);
+            } else {
+                audio.stopMusic();
+                audio.stopAmbience();
+            }
+        } catch (e) {
+            console.error("startGame error:", e);
         }
-    }, [audio, time]);
+    }, [audio, time, settings]);
 
     const toggleModal = useCallback((modalName) => {
         if (!audio.settings.muteAll) audio.playSound('action');
@@ -93,7 +124,8 @@ export const useGame = () => {
                 const newCust = customers.generateCustomer(
                     newTimeState.minutesElapsed,
                     inventory.inventoryState.upgrades,
-                    !!customers.customerState.currentCustomer // disable if full
+                    !!customers.customerState.currentCustomer, // disable if full
+                    settings.difficulty || 'cozy'
                 );
                 if (newCust && newCust.name) { // verify valid customer obj returned
                     addLog(`☕ ${newCust.name} arrived! Ordered: ${newCust.order}`, 'success');
@@ -110,6 +142,15 @@ export const useGame = () => {
             }
         });
     }, [gameMeta.debug, time, customers, inventory.inventoryState, addLog, audio.settings.muteAll, audio.playSound, uiState.activeModal]);
+
+    // Handle Customer Events (e.g. Leaving)
+    useEffect(() => {
+        if (customers.customerState.lastEvent === 'patience_zero') {
+            addLog("😞 Customer left in frustration! (-5 Reputation)", 'error');
+            if (!audio.settings.muteAll) audio.playSound('error');
+            customers.clearEvent();
+        }
+    }, [customers.customerState.lastEvent, addLog, audio.playSound, audio.settings.muteAll, customers]); // checking customers dependency stability
 
     const handleBrewAction = useCallback((action) => {
         const { mode, step } = brewing.brewingState;
@@ -463,13 +504,19 @@ export const useGame = () => {
     useEffect(() => {
         let interval;
         if (time.timeState.gameStarted && !gameMeta.debug.timePaused) {
-            const speed = gameMeta.debug.timeSpeed || 1;
+            let speed = gameMeta.debug.timeSpeed || 1;
+
+            // Difficulty Modifier
+            const difficulty = settings.difficulty || 'cozy';
+            if (difficulty === 'cozy') speed *= 0.8; // Slower
+            else if (difficulty === 'extreme') speed *= 1.5; // Faster
+
             interval = setInterval(() => {
-                advanceTimeWrapper(1);
-            }, 1000 / speed);
+                advanceTimeWrapper(0.1); // Smaller tick
+            }, 100 / speed); // Faster interval (100ms)
         }
         return () => clearInterval(interval);
-    }, [time.timeState.gameStarted, gameMeta.debug.timePaused, gameMeta.debug.timeSpeed, advanceTimeWrapper]);
+    }, [time.timeState.gameStarted, gameMeta.debug.timePaused, gameMeta.debug.timeSpeed, advanceTimeWrapper, settings.difficulty]);
 
     // Initial Load
     useEffect(() => {
@@ -506,6 +553,7 @@ export const useGame = () => {
         setSFXVolume: audio.setSFXVolume,
         setAmbienceVolume: audio.setAmbienceVolume,
         setUIScale,
+        setDifficulty,
         toggleDarkMode: (val) => setGameMeta(prev => ({ ...prev, darkModeEnabled: val })),
         toggleMuteAll: audio.toggleMuteAll,
         toggleMusic: audio.toggleMusic,

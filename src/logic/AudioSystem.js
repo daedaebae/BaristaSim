@@ -1,3 +1,6 @@
+// using public assets
+const BASE_URL = import.meta.env.BASE_URL;
+
 export class AudioSystem {
     constructor() {
         this.context = new (window.AudioContext || window.webkitAudioContext)();
@@ -7,7 +10,11 @@ export class AudioSystem {
         this.sfxVolume = 0.1; // 10% volume
         this.ambienceVolume = 0.3; // 30% volume
         this.ambienceAudio = null;
-        this.playlist = ['/assets/music_lofi.mp3', '/assets/synthesis.mp3', '/assets/funkylofi.mp3'];
+        this.playlist = [
+            `${BASE_URL}assets/music/music_lofi.mp3`,
+            `${BASE_URL}assets/music/synthesis.mp3`,
+            `${BASE_URL}assets/music/funkylofi.mp3`
+        ];
         this.currentTrackIndex = 0;
         this.trackPlayCount = 0; // Track how many times the current song has played
     }
@@ -137,7 +144,7 @@ export class AudioSystem {
 
     fadeIn(audio) {
         audio.volume = 0;
-        audio.play().catch(e => console.log("Audio play failed:", e));
+        audio.play().catch(e => console.error("[Audio] Play failed:", e));
 
         const fadeInterval = setInterval(() => {
             if (audio.volume < this.musicVolume) {
@@ -177,7 +184,7 @@ export class AudioSystem {
         this.ambienceAudio.volume = 0; // Start at 0 for fade in
 
         if (this.enabled) {
-            this.ambienceAudio.play().catch(e => console.log("Ambience play failed:", e));
+            this.ambienceAudio.play().catch(e => console.error("Ambience play failed:", e));
             // Fade in
             const fadeInterval = setInterval(() => {
                 if (this.ambienceAudio.volume < this.ambienceVolume) {

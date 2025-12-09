@@ -41,6 +41,28 @@ const SettingsModal = ({ isOpen, onClose, gameState, actions }) => {
             </div>
 
             <div className="menu-group">
+                <label>Difficulty</label>
+                <select
+                    value={settings.difficulty || 'cozy'}
+                    onChange={(e) => actions.setDifficulty(e.target.value)}
+                    style={{
+                        width: '100%',
+                        padding: '0.5rem',
+                        fontSize: '1rem',
+                        marginTop: '0.5rem',
+                        borderRadius: '4px',
+                        border: '2px solid #5d4037',
+                        backgroundColor: '#efebe9',
+                        color: '#3e2723'
+                    }}
+                >
+                    <option value="cozy">Cozy (Relaxed)</option>
+                    <option value="challenging">Challenging (Normal)</option>
+                    <option value="extreme">Extreme! (Fast)</option>
+                </select>
+            </div>
+
+            <div className="menu-group">
                 <label>
                     <input
                         type="checkbox"

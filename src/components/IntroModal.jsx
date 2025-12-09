@@ -36,7 +36,7 @@ const IntroModal = ({ isOpen, onStart }) => {
 
                         <div className="menu-content">
                             <p>
-                                Hating your job isn't uncommon, but you never <strong>hated</strong> it, you just never...
+                                Someone hating their job isn't uncommon, but you never <strong>hated</strong> yours, you just never...
                                 <strong> loved </strong> it!
                             </p>
                             <p>

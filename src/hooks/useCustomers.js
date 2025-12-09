@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from 'react';
-import pixelCustomer1 from '../assets/pixel_customer_1.png';
+import pixelCustomer1 from '../assets/characters/pixel_customer_1.png';
 
 export const useCustomers = () => {
     const [customerState, setCustomerState] = useState({
@@ -45,34 +45,25 @@ export const useCustomers = () => {
         });
     }, []);
 
-    const generateCustomer = useCallback((minutesElapsed, upgrades, arrivalDisabled) => {
+    const generateCustomer = useCallback((minutesElapsed, upgrades, arrivalDisabled, difficulty = 'cozy') => {
         let newCustomer = null;
 
         setCustomerState(prev => {
             if (prev.currentCustomer || arrivalDisabled) return prev;
-
-            let arrivalChance = 0.2;
-            if (prev.weather === 'rainy') arrivalChance = 0.1;
-            else if (prev.weather === 'sunny') arrivalChance = 0.25;
-
-            // To synchronously return the customer, we must determine creation based on deterministic logic or modify how we use state.
-            // Since we are inside a functional update, we can't extract the value out easily to the outer scope's return.
-            // However, we can move the random logic OUTSIDE the setter.
-            // But we need 'prev.weather'. We have 'customerState.weather' in scope!
-            // 'customerState' is a dependency now.
-
-            // Wait, if I add customerState to dependency, generateCustomer changes on every render.
-            // That's acceptable for this fix.
-            return prev; // Dummy return, we will do logic outside
+            // ... (keeping existing early return logic checks if needed, but we do main logic below)
+            return prev;
         });
 
-        // Better approach:
-        // logic outside setter.
+        // Logic outside setter
         if (customerState.currentCustomer || arrivalDisabled) return false;
 
         let arrivalChance = 0.2;
         if (customerState.weather === 'rainy') arrivalChance = 0.1;
         else if (customerState.weather === 'sunny') arrivalChance = 0.25;
+
+        // Difficulty affects arrival chance?
+        if (difficulty === 'cozy') arrivalChance *= 0.8;
+        if (difficulty === 'extreme') arrivalChance *= 1.2;
 
         if (Math.random() > (1 - arrivalChance)) {
             const names = ['Alice', 'Bob', 'Charlie', 'Dana', 'Eve', 'Frank', 'Grace', 'Heidi', 'Igor', 'Jasmine', 'Ken', 'Liam', 'Mia', 'Noah', 'Olivia'];
@@ -87,14 +78,23 @@ export const useCustomers = () => {
             else if (rand < 0.4) specialType = 'student';
             else if (rand < 0.5) specialType = 'tourist';
 
-            let patience = 100;
-            if (specialType === 'critic') patience = 50;
-            if (specialType === 'regular') patience = 150;
-            if (specialType === 'student') patience = 70;
-            if (specialType === 'tourist') patience = 120;
+            // Patience in Minutes
+            let basePatience = 20; // Standard
+            if (specialType === 'critic') basePatience = 15;
+            if (specialType === 'regular') basePatience = 30; // Loyal
+            if (specialType === 'student') basePatience = 18;
+            if (specialType === 'tourist') basePatience = 25;
+            if (specialType === 'hipster') basePatience = 15; // Impatient
 
-            if (customerState.weather === 'rainy') patience = Math.floor(patience * 0.8);
-            else if (customerState.weather === 'sunny') patience = Math.floor(patience * 1.2);
+            // Weather Modifier
+            if (customerState.weather === 'rainy') basePatience *= 0.9; // Grumpy
+            else if (customerState.weather === 'sunny') basePatience *= 1.1;
+
+            // Difficulty Modifier
+            if (difficulty === 'cozy') basePatience += 5;
+            if (difficulty === 'extreme') basePatience -= 5;
+
+            basePatience = Math.max(5, Math.floor(basePatience));
 
             let order = 'Coffee';
             if (upgrades.includes('mode_matcha') && (specialType === 'hipster' || Math.random() < 0.3)) {
@@ -107,9 +107,9 @@ export const useCustomers = () => {
                 name,
                 type: specialType || 'default',
                 order,
-                patience,
-                maxPatience: patience,
-                decay: 0.5,
+                patience: basePatience,
+                maxPatience: basePatience,
+                decay: 1.0, // 1 minute = 1 minute
                 satisfaction: 50,
                 arrivalTime: minutesElapsed,
                 avatar
@@ -168,6 +168,10 @@ export const useCustomers = () => {
         }));
     }, []);
 
+    const clearEvent = useCallback(() => {
+        setCustomerState(prev => ({ ...prev, lastEvent: null }));
+    }, []);
+
     const syncCustomerState = useCallback((saved) => {
         setCustomerState(prev => ({
             ...prev,
@@ -186,6 +190,7 @@ export const useCustomers = () => {
         clearCustomer,
         updateStats,
         resetDailyStats,
-        syncCustomerState
-    }), [customerState, setWeather, updatePatience, generateCustomer, clearCustomer, updateStats, resetDailyStats, syncCustomerState]);
+        syncCustomerState,
+        clearEvent
+    }), [customerState, setWeather, updatePatience, generateCustomer, clearCustomer, updateStats, resetDailyStats, syncCustomerState, clearEvent]);
 };

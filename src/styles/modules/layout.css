@@ -63,7 +63,7 @@
     /* Centers content horizontally */
     align-items: flex-end;
     /* Aligns content to the bottom of the visual area */
-    z-index: 2;
+    z-index: 0;
     /* Sets stacking order, typically above background but below HUD/characters */
     min-height: 0;
     /* Prevents flex item from growing beyond its content in some cases */

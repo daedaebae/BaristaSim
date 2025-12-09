@@ -17,6 +17,8 @@ import DialogueOverlay from './components/DialogueOverlay';
 
 import CharacterArea from './components/CharacterArea';
 
+import pixelCafeBg from './assets/backgrounds/pixel_cafe_bg.png';
+
 function App() {
   const game = useGame();
   const { uiState, toggleModal, startGame } = game;
@@ -36,7 +38,7 @@ function App() {
 
   return (
     <div className="game-container">
-      <img src="/assets/pixel_cafe_bg.png" className="bg-image" alt="Coffee Shop Background" />
+      <img src={pixelCafeBg} className="bg-image" alt="Coffee Shop Background" />
       <HUD {...game} />
       <div className="work-space">
         <CharacterArea

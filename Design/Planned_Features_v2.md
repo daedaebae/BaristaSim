@@ -58,6 +58,26 @@
         - [ ] Commit and push each feature to the 'react-native' branch.
         - [ ] Once the branch is ready, create a pull request for me to review.
 ## Upcoming Priorities (Phase 4)
+- **Game Mechanics & Balance**:
+    - **Difficulty Settings**:
+        - [ ] Add button in Settings to toggle difficulty (Cozy, Challenging, Extreme!).
+        - [ ] Default to "Cozy".
+        - [ ] **Cozy**: Slow down game time to make it easier.
+        - [ ] **Challenging**: Standard speed/difficulty.
+        - [ ] **Extreme!**: Faster time mechanics.
+    - **Customer Patience Mechanics**:
+        - [ ] **Visual Timer States**:
+            - [ ] Turn **Yellow** after 8 in-game minutes.
+            - [ ] Turn **Red** after 10 in-game minutes.
+            - [ ] **Blink Red** 1 minute before leaving.
+        - [ ] **Leave Times (Patience Limits)**:
+            - [ ] **Impatient**: 15 minutes.
+            - [ ] **Standard**: 20 minutes.
+            - [ ] **Loyal**: 30 minutes.
+        - [ ] **Interaction**:
+            - [ ] Customers walk out when time expires.
+            - [ ] Dialogue option to placate/extend patience (e.g. "Coming right up!").
+
 - **Main Controls Complexity**:
     - [ ] Introduce a multi-step process for drink preparation, starting with boiling water for Aeropress extraction.
         - [ ] **TODO**: Implement visual and auditory cues for water temperature and boiling.

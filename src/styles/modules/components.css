@@ -96,6 +96,7 @@
 
 .avatar.customer {
     position: relative;
+    bottom: 0;
     cursor: pointer;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     z-index: 15;
@@ -167,7 +168,7 @@
 
     /* Match HUD Background with Texture */
     background:
-        url('/assets/images/ui/coffee_log_bg.png'),
+        /* url('../../assets/ui/coffee_log_bg.png'), */
         linear-gradient(180deg, var(--highlight-color) 0%, var(--hud-gradient-end) 100%);
     background-repeat: repeat, no-repeat;
     background-size: 200px, auto;
@@ -449,7 +450,7 @@
     filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
     transition: transform 0.3s ease, opacity 0.3s ease;
     position: relative;
-    bottom: -20px;
+    bottom: 0;
 }
 
 .avatar.barista {
@@ -494,10 +495,12 @@
 }
 
 /* Brewing Station */
+/* Brewing Station */
 .brewing-station {
     position: absolute;
     bottom: 20px;
-    right: 5%;
+    left: 140px;
+    /* Moved from Right > Left to sit next to Barista */
     width: 300px;
     height: 400px;
     background: rgba(255, 250, 240, 0.85);
@@ -563,7 +566,7 @@
 }
 
 .state-plunged .plunger {
-    transform: translateY(0);
+    transform: translateY(-15px);
 }
 
 .state-plunged .contents {
@@ -727,8 +730,9 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: flex-end;
     position: absolute;
-    bottom: 140px;
+    bottom: 130px;
     /* Lifted up for cup */
     left: 50%;
     transform: translateX(-50%);
@@ -1333,7 +1337,7 @@
     /* Adjust Customer Portrait */
     .customer-portrait {
         width: 100px;
-        bottom: 120px;
+        bottom: 100px;
         /* Move up */
         left: 20px;
     }
@@ -1381,5 +1385,23 @@
     body.dark-mode .log-entry {
         color: #e6ccb2;
         /* Ensures individual entries follow suit */
+    }
+
+    @keyframes blink-urgent {
+        0% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.3;
+        }
+
+        100% {
+            opacity: 1;
+        }
+    }
+
+    .blink-urgent {
+        animation: blink-urgent 1s infinite ease-in-out;
     }
 }
