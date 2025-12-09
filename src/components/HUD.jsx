@@ -18,42 +18,42 @@ const HUD = ({ gameState, toggleModal }) => {
 
     return (
         <div id="hud" className="hud-horizontal" style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-            <Tooltip text="View Pantry" placement="bottom">
+            <Tooltip text="Pantry: View your ingredients and inventory" placement="bottom">
                 <div className="hud-item" onClick={() => toggleModal('inventory')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
                     <span className="hud-icon" style={{ fontSize: '24px', marginRight: '5px' }}>🎒</span>
                     <span className="hud-value">Pantry</span>
                 </div>
             </Tooltip>
 
-            <Tooltip text="Open Supplier" placement="bottom">
+            <Tooltip text="Supplier: Buy ingredients and upgrades" placement="bottom">
                 <div className="hud-item" onClick={() => toggleModal('shop')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
                     <span className="hud-icon" style={{ fontSize: '24px', marginRight: '5px' }}>🛒</span>
                     <span className="hud-value">Supplier</span>
                 </div>
             </Tooltip>
 
-            <Tooltip text="Current Time" placement="bottom">
+            <Tooltip text="Time: Current in-game time" placement="bottom">
                 <div className="hud-item" style={{ display: 'flex', alignItems: 'center' }}>
                     <span className="hud-icon" style={{ fontSize: '24px', marginRight: '5px' }}>⏰</span>
                     <span id="time-display">{timeString}</span>
                 </div>
             </Tooltip>
 
-            <Tooltip text="Current Funds" placement="bottom">
+            <Tooltip text="Funds: Current money available" placement="bottom">
                 <div className="hud-item" style={{ display: 'flex', alignItems: 'center' }}>
                     <span className="hud-icon" style={{ fontSize: '24px', marginRight: '5px' }}>💵</span>
                     <span id="cash-display">${cash.toFixed(2)}</span>
                 </div>
             </Tooltip>
 
-            <Tooltip text="Reputation Level" placement="bottom">
+            <Tooltip text="Reputation: Your current fame" placement="bottom">
                 <div className="hud-item" style={{ display: 'flex', alignItems: 'center' }}>
                     <span className="hud-icon" style={{ fontSize: '24px', marginRight: '5px' }}>⭐</span>
                     <span id="rep-display">{stats.reputation} ★</span>
                 </div>
             </Tooltip>
 
-            <Tooltip text="Customer Satisfaction" placement="bottom">
+            <Tooltip text="Satisfaction: Current customer mood" placement="bottom">
                 <div className="hud-item" style={{ display: 'flex', alignItems: 'center' }}>
                     <span className="hud-icon">😊</span>
                     <div className="satisfaction-bar-container" style={{ width: '60px', height: '10px', background: '#333', borderRadius: '5px', marginLeft: '5px', overflow: 'hidden' }}>

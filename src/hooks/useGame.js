@@ -156,7 +156,11 @@ export const useGame = () => {
         const { mode, step } = brewing.brewingState;
 
         if (mode === 'coffee') {
-            if (action === 'GRIND' && step === 0) {
+            if (action === 'BOIL' && step === 0) {
+                brewing.advanceStep();
+                addLog("Water boiling...", 'neutral');
+                audio.playSteam();
+            } else if (action === 'GRIND' && step === 1) {
                 if (inventory.deductResources({ 'beans_standard': 20 })) {
                     brewing.advanceStep();
                     addLog("Beans ground.", 'success');
@@ -165,36 +169,36 @@ export const useGame = () => {
                     addLog("Not enough beans!", 'error');
                     audio.playSound('error');
                 }
-            } else if (action === 'ADD_WATER' && step === 1) {
+            } else if (action === 'ADD_WATER' && step === 2) {
                 if (inventory.deductResources({ 'water': 250 })) {
                     brewing.advanceStep();
-                    addLog("Water added.", 'success');
+                    addLog("Hot water added.", 'success');
                     audio.playSound('pour');
                 } else {
                     addLog("Not enough water!", 'error');
                     audio.playSound('error');
                 }
             } else if (action === 'STIR') {
-                if (step === 2) {
+                if (step === 3) {
                     brewing.advanceStep();
                     addLog("Stirred.", 'success');
                     audio.playSound('action');
-                } else if (step < 2) {
-                    addLog("You practice dry stirring a few times...you feel more confident in your stirring abilities!", 'neutral');
-                    audio.playSound('action'); // Maybe a different sound? Reusing action for now.
+                } else if (step < 3) {
+                    addLog("You practice dry stirring...you feel more confident!", 'neutral');
+                    audio.playSound('action');
                 }
             } else if (action === 'PLUNGE') {
-                if (step === 3) {
+                if (step === 4) {
                     if (inventory.deductResources({ 'filters': 1 })) {
                         brewing.advanceStep();
                         addLog("Plunged!", 'success');
-                        audio.playSound('action');
+                        audio.playSound('action'); // Maybe steam sound here too?
                     } else {
                         addLog("Not enough filters!", 'error');
                         audio.playSound('error');
                     }
-                } else if (step < 2) {
-                    addLog("You practice dry plungeing a few times...you feel more confident in your plungeing abilities!", 'neutral');
+                } else if (step < 4) {
+                    addLog("You practice plunging...resistance is futile without liquid!", 'neutral');
                     audio.playSound('action');
                 }
             }
@@ -265,7 +269,7 @@ export const useGame = () => {
 
     const performServe = useCallback(() => {
         const { mode, step } = brewing.brewingState;
-        const ready = (mode === 'coffee' && step === 4) || (mode === 'matcha' && step === 3) || (mode === 'espresso' && step === 5); // Logic from prev useGame
+        const ready = (mode === 'coffee' && step === 5) || (mode === 'matcha' && step === 3) || (mode === 'espresso' && step === 5); // Updated Coffee step
 
         if (!ready) {
             addLog("Drink not ready!", 'error');

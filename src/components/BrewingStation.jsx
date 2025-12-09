@@ -3,10 +3,10 @@ export const BrewingVisuals = ({ gameState }) => {
 
     // Helper for coffee state class specifically
     const getCoffeeStateClass = () => {
-        if (step >= 4) return 'state-plunged';
-        if (step >= 3) return 'state-stirred';
-        if (step >= 2) return 'state-water';
-        if (step >= 1) return 'state-ground';
+        if (step >= 5) return 'state-plunged';
+        if (step >= 4) return 'state-stirred';
+        if (step >= 3) return 'state-water';
+        if (step >= 2) return 'state-ground';
         return '';
     };
 
@@ -16,7 +16,7 @@ export const BrewingVisuals = ({ gameState }) => {
             <div className="station-area">
                 {mode === 'coffee' && (
                     <div className={`station ${getCoffeeStateClass()}`}>
-                        <div className={`hand-grinder ${step === 0 ? 'grinding' : ''}`}>
+                        <div className={`hand-grinder ${step === 1 ? 'grinding' : ''}`}>
                             <div className="handle"></div>
                         </div>
                         <div className="aeropress">
@@ -24,10 +24,10 @@ export const BrewingVisuals = ({ gameState }) => {
                                 <div className={`contents`}></div>
                             </div>
                             <div className="filter-cap"></div>
-                            <div className={`plunger ${step >= 4 ? 'plunged' : ''}`}></div>
+                            <div className={`plunger ${step >= 5 ? 'plunged' : ''}`}></div>
                         </div>
-                        <div className={`kettle ${step === 1 ? 'pouring' : ''}`}></div>
-                        <div className={`cup ${step >= 4 ? 'filled' : ''}`}>
+                        <div className={`kettle ${step === 0 ? 'boiling' : (step === 2 ? 'pouring' : '')}`}></div>
+                        <div className={`cup ${step >= 5 ? 'filled' : ''}`}>
                             <div className="steam-container">
                                 <div className="steam-puff"></div>
                                 <div className="steam-puff delay-1"></div>
@@ -74,17 +74,19 @@ export const BrewingControls = ({ gameState, handleBrewAction, performServe, tog
         <div id="controls-area" className="controls-area">
             {mode === 'coffee' && (
                 <div id="coffee-controls" className="control-group">
-                    <button className="btn" onClick={() => handleBrewAction('GRIND')} disabled={step > 0}>Grind Beans</button>
+                    <button className="btn" onClick={() => handleBrewAction('BOIL')} disabled={step > 0}>Boil Water</button>
                     <div className="arrow">→</div>
-                    <button className="btn" onClick={() => handleBrewAction('ADD_WATER')} disabled={step !== 1}>Add Water</button>
+                    <button className="btn" onClick={() => handleBrewAction('GRIND')} disabled={step !== 1}>Grind Beans</button>
                     <div className="arrow">→</div>
-                    <button className="btn" onClick={() => handleBrewAction('STIR')} disabled={step > 2}>Stir</button>
+                    <button className="btn" onClick={() => handleBrewAction('ADD_WATER')} disabled={step !== 2}>Add Water</button>
                     <div className="arrow">→</div>
-                    <button className="btn" onClick={() => handleBrewAction('PLUNGE')} disabled={step > 3}>Plunge</button>
+                    <button className="btn" onClick={() => handleBrewAction('STIR')} disabled={step > 3}>Stir</button>
+                    <div className="arrow">→</div>
+                    <button className="btn" onClick={() => handleBrewAction('PLUNGE')} disabled={step !== 4}>Plunge</button>
                     <div className="arrow">→</div>
                     <button
                         id="btn-serve-coffee"
-                        className={`btn ${step === 4 ? '' : 'disabled'}`}
+                        className={`btn ${step === 5 ? '' : 'disabled'}`}
                         onClick={performServe}
                     >
                         Serve Coffee

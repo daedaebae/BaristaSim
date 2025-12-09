@@ -104,6 +104,36 @@ export class AudioSystem {
         osc.stop(this.context.currentTime + 1.0);
     }
 
+    playSteam() {
+        if (!this.enabled) return;
+        // White noise buffer for steam/boil
+        const bufferSize = this.context.sampleRate * 1.5; // 1.5 seconds
+        const buffer = this.context.createBuffer(1, bufferSize, this.context.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+            data[i] = Math.random() * 2 - 1;
+        }
+
+        const noise = this.context.createBufferSource();
+        noise.buffer = buffer;
+
+        const gain = this.context.createGain();
+        // Envelope
+        gain.gain.setValueAtTime(0, this.context.currentTime);
+        gain.gain.linearRampToValueAtTime(this.sfxVolume * 0.4, this.context.currentTime + 0.2);
+        gain.gain.linearRampToValueAtTime(0, this.context.currentTime + 1.5);
+
+        // Lowpass filter to make it sound like rumble/boil
+        const filter = this.context.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.value = 400;
+
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.context.destination);
+        noise.start();
+    }
+
     playMusic() {
         if (!this.bgm) {
             this.playNextTrack();

@@ -1387,21 +1387,72 @@
         /* Ensures individual entries follow suit */
     }
 
-    @keyframes blink-urgent {
-        0% {
-            opacity: 1;
-        }
+}
 
-        50% {
-            opacity: 0.3;
-        }
-
-        100% {
-            opacity: 1;
-        }
+/* Global Animations (Moved from media query) */
+@keyframes blink-urgent {
+    0% {
+        opacity: 1;
     }
 
-    .blink-urgent {
-        animation: blink-urgent 1s infinite ease-in-out;
+    50% {
+        opacity: 0.3;
     }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+.blink-urgent {
+    animation: blink-urgent 1s infinite ease-in-out;
+}
+
+/* Kettle Styles */
+.kettle {
+    position: absolute;
+    bottom: 20px;
+    right: 80px;
+    width: 50px;
+    height: 40px;
+    background: #8d6e63;
+    border: 2px solid #5d4037;
+    border-radius: 6px;
+    z-index: 5;
+    transition: transform 0.3s;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.kettle::before {
+    /* Handle */
+    content: '';
+    position: absolute;
+    top: -15px;
+    right: 5px;
+    width: 25px;
+    height: 15px;
+    border: 3px solid #3e2723;
+    border-bottom: none;
+    border-radius: 15px 15px 0 0;
+}
+
+.kettle::after {
+    /* Spout */
+    content: '';
+    position: absolute;
+    top: 5px;
+    left: -10px;
+    width: 15px;
+    height: 8px;
+    background: #8d6e63;
+    border: 1px solid #5d4037;
+    transform: rotate(-30deg);
+    border-radius: 2px;
+}
+
+.boiling {
+    animation: rumble 0.1s linear infinite;
+    background-color: #bcaaa4;
+    /* Lighter when hot */
+    box-shadow: 0 0 8px rgba(255, 87, 34, 0.4);
 }
