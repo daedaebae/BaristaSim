@@ -569,11 +569,18 @@
 }
 
 .state-plunged .plunger {
-    transform: translateY(-15px);
+    transform: translateY(-10px);
+    /* Push all the way down */
+}
+
+.state-plunged .filter-cap {
+    transform: translateY(-10px);
+    /* Move down with plunger */
 }
 
 .state-plunged .contents {
-    height: 20%;
+    height: 10%;
+    /* Reduce liquid visual */
 }
 
 /* Matcha Mode Overrides */
@@ -730,12 +737,17 @@
     border: 2px solid #333;
     border-radius: 2px;
     margin-bottom: 0;
-    transition: transform 0.5s ease;
-    transform: translateY(-230px);
-    /* Start high */
+    transition: transform 1.5s cubic-bezier(0.45, 0.05, 0.55, 0.95);
+    /* Smooth, slower plunge */
+    transform: translateY(-145px);
+    /* Start sitting exactly on top of the 140px chamber */
     position: relative;
     left: 0px;
     z-index: 2;
+}
+
+.plunging-active {
+    animation: press 0.2s linear infinite;
 }
 
 .plunger::before {
@@ -774,6 +786,10 @@
     /* Connect to chamber */
     z-index: 6;
     border: 1px solid #111;
+    transition: transform 1.5s cubic-bezier(0.45, 0.05, 0.55, 0.95);
+    transform: translateY(-145px);
+    /* Start on top with plunger */
+    position: relative;
 }
 
 /* Paper Cup */
