@@ -79,10 +79,46 @@ export class AudioSystem {
     playChime() { this.playTone(880, 'triangle', 0.5); }
 
     playGrind() {
-        // Low pitch sawtooth for grinding
-        this.playTone(80, 'sawtooth', 1.5);
-        setTimeout(() => this.playTone(90, 'sawtooth', 1.5), 100);
-        setTimeout(() => this.playTone(80, 'sawtooth', 1.5), 200);
+        if (!this.enabled || !this.context.sampleRate) return;
+
+        // Create noise buffer for "crunchy" sound
+        const duration = 1.2;
+        const bufferSize = this.context.sampleRate * duration;
+        const buffer = this.context.createBuffer(1, bufferSize, this.context.sampleRate);
+        const data = buffer.getChannelData(0);
+
+        // Fill with noise
+        for (let i = 0; i < bufferSize; i++) {
+            data[i] = Math.random() * 2 - 1;
+        }
+
+        const noise = this.context.createBufferSource();
+        noise.buffer = buffer;
+
+        // Filter for "crunch" (Bandpass)
+        const filter = this.context.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(400, this.context.currentTime); // Center freq
+        filter.Q.value = 1.0; // Width
+
+        // Gain Envelope (Volume)
+        const gain = this.context.createGain();
+        // Start softer, modulate loudness for texture
+        gain.gain.setValueAtTime(0, this.context.currentTime);
+        gain.gain.linearRampToValueAtTime(this.sfxVolume * 0.8, this.context.currentTime + 0.1);
+
+        // Modulate gain to simulate "grinding" pulses
+        const now = this.context.currentTime;
+        for (let t = 0; t < duration; t += 0.1) {
+            gain.gain.setValueAtTime(this.sfxVolume * (0.6 + Math.random() * 0.4), now + t);
+        }
+
+        gain.gain.linearRampToValueAtTime(0, now + duration);
+
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.context.destination);
+        noise.start();
     }
 
     playPour() {
@@ -105,7 +141,7 @@ export class AudioSystem {
     }
 
     playSteam() {
-        if (!this.enabled) return;
+        if (!this.enabled || !this.context.sampleRate) return;
         // White noise buffer for steam/boil
         const bufferSize = this.context.sampleRate * 1.5; // 1.5 seconds
         const buffer = this.context.createBuffer(1, bufferSize, this.context.sampleRate);

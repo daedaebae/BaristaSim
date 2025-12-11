@@ -203,7 +203,6 @@ export const useGame = () => {
                     brewing.setBoiling(false);
                     brewing.advanceStep();
                     addLog("Water hot!", 'success');
-                    // audio.playSound('boil_finish'); // Optional: distinct sound
                 }, 3000);
             } else if (action === 'GRIND' && step === 1) {
                 if (inventory.deductResources({ 'beans_standard': 20 })) {
