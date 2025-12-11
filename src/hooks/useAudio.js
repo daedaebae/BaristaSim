@@ -46,7 +46,8 @@ export const useAudio = (initialSettings) => {
             'action': () => audioRef.current.playAction(),
             'grind': () => audioRef.current.playGrind(),
             'pour': () => audioRef.current.playPour(),
-            'chime': () => audioRef.current.playChime()
+            'chime': () => audioRef.current.playChime(),
+            'steam': () => audioRef.current.playSteam()
         };
 
         if (actions[type]) actions[type]();

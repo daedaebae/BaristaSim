@@ -197,7 +197,7 @@ export const useGame = () => {
             if (action === 'BOIL' && step === 0) {
                 brewing.setBoiling(true);
                 addLog("Heating water...", 'neutral');
-                audio.playSteam();
+                audio.playSound('steam');
 
                 setTimeout(() => {
                     brewing.setBoiling(false);
