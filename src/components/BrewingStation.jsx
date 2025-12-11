@@ -22,9 +22,11 @@ export const BrewingVisuals = ({ gameState }) => {
                         <div className="aeropress">
                             <div className="chamber">
                                 <div className={`contents`}></div>
+                                <div className="filter-cap"></div> {/* Real Filter Cap */}
                             </div>
-                            <div className="filter-cap"></div>
-                            <div className={`plunger ${step >= 5 ? 'plunged' : ''}`}></div>
+                            <div className={`plunger ${step >= 5 ? 'plunged' : ''}`}>
+                                <div className="rubber-seal"></div> {/* Seal attached to plunger */}
+                            </div>
                         </div>
                         <div className={`kettle ${step === 0 ? 'boiling' : (step === 2 ? 'pouring' : '')}`}></div>
                         <div className={`cup ${step >= 5 ? 'filled' : ''}`}>

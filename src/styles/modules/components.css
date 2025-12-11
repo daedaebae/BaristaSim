@@ -573,11 +573,7 @@
     /* Push all the way down */
 }
 
-.state-plunged .filter-cap {
-    transform: translateY(-10px);
-    /* Move down with plunger */
-}
-
+/* No specific translation needed for seal as it moves with plunger */
 .state-plunged .contents {
     height: 10%;
     /* Reduce liquid visual */
@@ -770,26 +766,44 @@
     left: -1px;
     width: 100%;
     height: 12px;
+    background: transparent;
+    /* Removed fake seal */
+    /* border: 1px solid #000; */
+    box-shadow: none;
+}
+
+/* Rubber Seal (Attached to Plunger) */
+.rubber-seal {
+    width: 100%;
+    /* Matches Plunger width */
+    height: 12px;
     background: #1a1a1a;
+    /* Black Rubber */
     border-radius: 4px;
     border: 1px solid #000;
+    position: absolute;
+    bottom: -12px;
+    /* Hangs off bottom of plunger */
+    left: -1px;
+    /* Account for border offset */
+    width: 86px;
+    /* Explicit width to match parent + borders */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-/* Filter Cap */
+/* Filter Cap (Static on Chamber) */
 .filter-cap {
     width: 104px;
     height: 12px;
     background: #333;
     border-radius: 4px;
-    margin-top: -6px;
-    /* Connect to chamber */
+    position: absolute;
+    bottom: -12px;
+    /* Below chamber */
+    left: -2px;
+    /* Center alignment */
     z-index: 6;
     border: 1px solid #111;
-    transition: transform 1.5s cubic-bezier(0.45, 0.05, 0.55, 0.95);
-    transform: translateY(-145px);
-    /* Start on top with plunger */
-    position: relative;
 }
 
 /* Paper Cup */
