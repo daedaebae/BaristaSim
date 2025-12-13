@@ -288,23 +288,12 @@ export const useGame = () => {
 
     }, [brewing, inventory, addLog, audio]);
 
-    const performServe = useCallback(() => {
+    const performServe = useCallback((isOnTheHouse = false) => {
+        // Ensure isOnTheHouse is boolean (react event protection)
+        const isFree = isOnTheHouse === true;
+
         const { mode, step } = brewing.brewingState;
         const ready = (mode === 'coffee' && step === 5) || (mode === 'matcha' && step === 3) || (mode === 'espresso' && step === 5); // Updated Coffee step
-
-        // HARDER GAMEPLAY: Allow serving swill
-        /*
-        if (!ready) {
-            addLog("Drink not ready!", 'error');
-            audio.playSound('error');
-            return;
-        }
-        if (inventory.inventoryState.inventory.cups < 1) {
-            addLog("Out of cups!", 'error');
-            audio.playSound('error');
-            return;
-        }
-        */
 
         if (!customers.customerState.currentCustomer) {
             addLog("No customer to serve!", 'error');
@@ -332,20 +321,34 @@ export const useGame = () => {
         const patienceBonus = customer.patience > 20 ? 1.2 : 1.0;
         const basePrice = 4.00;
         const tip = (customer.patience / 10) * 0.5;
-        const total = (basePrice * quality * patienceBonus) + tip;
+
+        // Calculate Total
+        let total = (basePrice * quality * patienceBonus) + tip;
+        if (isFree) total = 0; // On the House!
 
         let repChange = 0;
         if (quality >= 1.0 && patienceBonus > 1.0) repChange = 1;
         else if (quality < 0.5) repChange = -1;
 
+        // On The House Bonus
+        if (isFree) {
+            if (quality >= 0.8) {
+                repChange += 2; // Small rep boost for generosity (+1 base + 2 bonus = 3 total)
+                addLog("Customer loved the free drink! (+Rep)", 'success');
+            } else {
+                addLog("It was free, but they clearly didn't enjoy it.", 'neutral');
+            }
+        }
+
         // Effects
         inventory.addCash(total);
         inventory.deductResources({ 'cups': 1 }); // We checked before, so this should pass. (Now allows negative)
-        customers.updateStats(total, tip, repChange, customer.name);
+        customers.updateStats(total, isFree ? 0 : tip, repChange, customer.name);
         customers.clearCustomer();
         brewing.resetBrewing();
 
-        addLog(`Served ${customer.name}! +$${total.toFixed(2)}`, 'success');
+        const logMsg = isFree ? `Served ${customer.name} (On the House)!` : `Served ${customer.name}! +$${total.toFixed(2)}`;
+        addLog(logMsg, 'success');
         audio.playSound('success');
         saveGame(true); // Auto-save on serve
 

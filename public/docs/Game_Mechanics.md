@@ -66,3 +66,32 @@ Customize your cart's look!
 -   **Industrial Metal**: Sleek and modern.
 -   **Luxury Marble**: Premium elegance.
 *Purchased skins can be equipped from the Shop.*
+
+---
+
+## 🖥️ UI & Controls
+We've optimized the interface for both desktop and mobile baristas.
+
+### Controls
+-   **Floating Controls / Mobile Nav**: Access Settings, Wiki, and Audio controls from the floating buttons (bottom-right on desktop, bottom-bar on mobile).
+-   **Tooltips**: Hover over ANY button (including brewing controls) to see exactly what it does.
+-   **Drag & Drop**: (Coming Soon)
+
+### Visuals
+-   **Avatars**: Full-body pixel art avatars represent you and your customers.
+-   **Visibility**: The interface adapts to prevent the brewing station from hiding characters.
+
+---
+
+## 🎭 Characters
+Meet the regulars! Characters in Chillista have unique personalities and traits that affect gameplay.
+
+### The Roster
+-   **Alice (Graphic Designer)**: Creative and patient. Loves Matcha.
+-   **Bob (Contractor)**: Busy and efficient. Wants his coffee fast.
+-   **Charlie**: The friendly everyman.
+-   **Dana (Influencer)**: Trendy and critical. Watch your reputation!
+-   **Eve**: A mystery wrapped in an enigma.
+-   **Frank**: Dislikes complexities. Just wants a good brew.
+
+*Traits like "Impatient" or "Generous" directly affect their Patience timer and Tipping behavior.*

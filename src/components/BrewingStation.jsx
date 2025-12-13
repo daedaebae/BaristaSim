@@ -99,12 +99,13 @@ export const BrewingControls = ({ gameState, handleBrewAction, performServe, tog
                         <button className="btn" onClick={() => handleBrewAction('PLUNGE')}>Plunge</button>
                     </Tooltip>
                     <Tooltip text="Serve to customer">
-                        <button
-                            id="btn-serve-coffee"
-                            className="btn action"
-                            onClick={performServe}
-                        >
+                        <button id="btn-serve-coffee" className="btn action" onClick={() => performServe(false)}>
                             Serve Coffee
+                        </button>
+                    </Tooltip>
+                    <Tooltip text="Serve for free (+Reputation)">
+                        <button id="btn-serve-free-coffee" className="btn nav" onClick={() => performServe(true)}>
+                            On the House
                         </button>
                     </Tooltip>
                     <Tooltip text="Chat with customer">
@@ -125,12 +126,13 @@ export const BrewingControls = ({ gameState, handleBrewAction, performServe, tog
                         <button className="btn" onClick={() => handleBrewAction('WHISK')}>Whisk</button>
                     </Tooltip>
                     <Tooltip text="Serve to customer">
-                        <button
-                            id="btn-serve-matcha"
-                            className="btn action"
-                            onClick={performServe}
-                        >
+                        <button id="btn-serve-matcha" className="btn action" onClick={() => performServe(false)}>
                             Serve Matcha
+                        </button>
+                    </Tooltip>
+                    <Tooltip text="Serve for free (+Reputation)">
+                        <button id="btn-serve-free-matcha" className="btn nav" onClick={() => performServe(true)}>
+                            On the House
                         </button>
                     </Tooltip>
                     <Tooltip text="Chat with customer">
@@ -157,12 +159,13 @@ export const BrewingControls = ({ gameState, handleBrewAction, performServe, tog
                         <button className="btn" onClick={() => handleBrewAction('POUR')}>Pour Art</button>
                     </Tooltip>
                     <Tooltip text="Serve to customer">
-                        <button
-                            id="btn-serve-espresso"
-                            className="btn action"
-                            onClick={performServe}
-                        >
+                        <button id="btn-serve-espresso" className="btn action" onClick={() => performServe(false)}>
                             Serve Espresso
+                        </button>
+                    </Tooltip>
+                    <Tooltip text="Serve for free (+Reputation)">
+                        <button id="btn-serve-free-espresso" className="btn nav" onClick={() => performServe(true)}>
+                            On the House
                         </button>
                     </Tooltip>
                     <Tooltip text="Chat with customer">
