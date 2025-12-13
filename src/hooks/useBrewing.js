@@ -5,11 +5,12 @@ export const useBrewing = () => {
         mode: 'coffee',
         step: 0,
         beanType: null,
-        isBoiling: false // New state
+        isBoiling: false,
+        waterTemp: 'cold' // 'cold' or 'hot'
     });
 
     const setMode = useCallback((mode) => {
-        setBrewingState(prev => ({ ...prev, mode, step: 0, beanType: null, isBoiling: false }));
+        setBrewingState(prev => ({ ...prev, mode, step: 0, beanType: null, isBoiling: false, waterTemp: 'cold' }));
     }, []);
 
     const advanceStep = useCallback((beanType = null) => {
@@ -24,12 +25,16 @@ export const useBrewing = () => {
         setBrewingState(prev => ({ ...prev, isBoiling }));
     }, []);
 
+    const setWaterTemp = useCallback((temp) => {
+        setBrewingState(prev => ({ ...prev, waterTemp: temp }));
+    }, []);
+
     const setStrictStep = useCallback((step) => {
         setBrewingState(prev => ({ ...prev, step }));
     }, []);
 
     const resetBrewing = useCallback(() => {
-        setBrewingState(prev => ({ ...prev, step: 0, beanType: null, isBoiling: false }));
+        setBrewingState(prev => ({ ...prev, step: 0, beanType: null, isBoiling: false, waterTemp: 'cold' }));
     }, []);
 
     const syncBrewingState = useCallback((savedState) => {
@@ -40,9 +45,10 @@ export const useBrewing = () => {
         brewingState,
         setMode,
         advanceStep,
-        setBoiling, // Export
+        setBoiling,
+        setWaterTemp,
         resetBrewing,
         syncBrewingState,
         setStrictStep
-    }), [brewingState, setMode, advanceStep, setBoiling, resetBrewing, syncBrewingState, setStrictStep]);
+    }), [brewingState, setMode, advanceStep, setBoiling, setWaterTemp, resetBrewing, syncBrewingState, setStrictStep]);
 };

@@ -13,6 +13,7 @@ import FinancialsModal from './components/FinancialsModal';
 import ReputationModal from './components/ReputationModal';
 import CustomersModal from './components/CustomersModal';
 import CalendarModal from './components/CalendarModal';
+import AvatarModal from './components/AvatarModal';
 
 import IntroModal from './components/IntroModal';
 import GameLog from './components/GameLog';
@@ -59,11 +60,28 @@ function App() {
 
 
       <div className="work-space">
+        {/* Layer 1: Avatars (Behind Station) */}
         <CharacterArea
           currentCustomer={game.gameState.currentCustomer}
           minutesElapsed={game.gameState.minutesElapsed}
+          playerName={game.gameState.playerName}
+          playerAvatar={game.gameState.playerAvatar}
+          onEditProfile={() => toggleModal('avatar')}
+          renderMode="avatars"
         />
+
+        {/* The Station */}
         <BrewingVisuals {...game} />
+
+        {/* Layer 2: Bubbles (Above Station) */}
+        <CharacterArea
+          currentCustomer={game.gameState.currentCustomer}
+          minutesElapsed={game.gameState.minutesElapsed}
+          playerName={game.gameState.playerName}
+          playerAvatar={game.gameState.playerAvatar}
+          onEditProfile={() => toggleModal('avatar')}
+          renderMode="bubbles"
+        />
       </div>
       <BrewingControls {...game} toggleModal={toggleModal} />
 
@@ -130,6 +148,15 @@ function App() {
 
       {uiState.activeModal === 'wiki' && (
         <WikiModal close={() => toggleModal('wiki')} />
+      )}
+
+      {uiState.activeModal === 'avatar' && (
+        <AvatarModal
+          gameState={game.gameState}
+          setPlayerAvatar={game.setPlayerAvatar}
+          setPlayerName={game.setPlayerName}
+          close={() => toggleModal('avatar')}
+        />
       )}
 
       <DebugModal

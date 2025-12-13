@@ -6,6 +6,7 @@
 -   **Earning Reputation**:
     -   Serving High-Quality drinks (Perfect optimization).
     -   Serving "Critic" customers.
+    -   **On the House**: Serving a free drink to a satisfied customer (Quality High) grants a **Bonus**.
     -   Completing daily challenges (Future).
 -   **Losing Reputation**:
     -   Customers leaving due to patience (already implemented: -5 Rep).

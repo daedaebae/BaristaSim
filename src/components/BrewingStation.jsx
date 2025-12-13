@@ -3,8 +3,9 @@ import Tooltip from './Tooltip';
 export const BrewingVisuals = ({ gameState }) => {
     // ... (unchanged)
     const { mode, step, isBoiling } = gameState.brewingState;
-    // Extract activeSkin from inventoryState (flat in gameState)
+    // Extract activeSkin (Cart) and activeCounter (Workspace)
     const activeSkin = gameState.activeSkin || 'skin-default';
+    const activeCounter = gameState.activeCounter || 'counter_plastic';
 
     // Helper for coffee state class specifically
     const getCoffeeStateClass = () => {
@@ -16,7 +17,7 @@ export const BrewingVisuals = ({ gameState }) => {
     };
 
     return (
-        <div className={`brewing-station ${activeSkin}`}>
+        <div className={`brewing-station ${activeSkin} ${activeCounter}`}>
             {/* Station Visuals */}
             <div className="station-area">
                 {mode === 'coffee' && (

@@ -32,6 +32,7 @@ export const useGame = () => {
     const [gameMeta, setGameMeta] = useState({
         gameStarted: savedGame ? savedGame.gameStarted : false,
         playerName: savedGame ? savedGame.playerName : 'Barista',
+        playerAvatar: savedGame ? (savedGame.playerAvatar || 'default') : 'default', // 'default' or 'var1', 'var2', 'var3'
         weather: savedGame ? savedGame.weather : 'sunny',
         unlockedLocations: savedGame ? savedGame.unlockedLocations : ['cart'],
         darkModeUnlocked: savedGame ? savedGame.darkModeUnlocked : false,
@@ -217,6 +218,7 @@ export const useGame = () => {
                     // But for this simplified state machine, Boiling takes us to "Ready to Grind" or just "Water Hot".
                     // Original: Step 0 -> 1.
                     brewing.setStrictStep(1);
+                    brewing.setWaterTemp('hot');
                     addLog("Water hot!", 'success');
                 }, 3000);
             } else if (action === 'GRIND') {
@@ -230,10 +232,13 @@ export const useGame = () => {
                     // deductResources now returns TRUE always (negative inv). So this block always runs!
                     // The "else" block is now unreachable with my useInventory change.
                 }
-            } else if (action === 'ADD_WATER') {
                 if (inventory.deductResources({ 'water': 250 })) {
                     brewing.setStrictStep(3); // Jump to "Water Added"
-                    addLog("Hot water added.", 'success');
+                    if (brewing.brewingState.waterTemp === 'hot') {
+                        addLog("Hot water added.", 'success');
+                    } else {
+                        addLog("Added COLD water...", 'neutral');
+                    }
                     audio.playSound('pour');
                 }
             } else if (action === 'STIR') {
@@ -310,13 +315,19 @@ export const useGame = () => {
         let quality = 0.1; // Default for unfinished/swill (Hard Mode)
 
         if (ready) {
-            quality = 1.0;
-            if (mode === 'coffee') {
-                if (customer.order === 'Matcha Latte') quality = 0.1;
-                else if (brewing.brewingState.beanType === 'PRM') quality = 1.5;
-            } else if (mode === 'matcha') {
-                if (customer.order !== 'Matcha Latte') quality = 0.5;
-                else quality = 2.0;
+            // Check Water Temp
+            if (brewing.brewingState.waterTemp !== 'hot' && (mode === 'coffee' || mode === 'matcha')) {
+                quality = 0.5; // Cold Water Penalty (Unfinished/Bad)
+                addLog("Served cold drink... (Forgot to boil!)", 'neutral');
+            } else {
+                quality = 1.0;
+                if (mode === 'coffee') {
+                    if (customer.order === 'Matcha Latte') quality = 0.1;
+                    else if (brewing.brewingState.beanType === 'PRM') quality = 1.5;
+                } else if (mode === 'matcha') {
+                    if (customer.order !== 'Matcha Latte') quality = 0.5;
+                    else quality = 2.0;
+                }
             }
         } else {
             addLog("Served unfinished drink...", 'neutral');
@@ -599,6 +610,11 @@ export const useGame = () => {
         setUIScale,
         setDifficulty,
         toggleDarkMode: (val) => setGameMeta(prev => ({ ...prev, darkModeEnabled: val })),
+        setPlayerName: (name) => setGameMeta(prev => ({ ...prev, playerName: name })), // Silent update
+        setPlayerAvatar: (avatarId) => {
+            setGameMeta(prev => ({ ...prev, playerAvatar: avatarId }));
+            if (!audio.settings.muteAll) audio.playSound('action');
+        },
         toggleMuteAll: audio.toggleMuteAll,
         toggleMusic: audio.toggleMusic,
         skipTrack: () => { if (audio.skipTrack()) addLog("Skipped track >>"); },

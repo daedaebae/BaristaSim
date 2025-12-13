@@ -5,6 +5,12 @@
     - [x] Name, age, gender, personality, etc. (Implemented in `src/data/characters.js`)
     - [x] Sentiment, mood, and personality traits that affect their behavior. (Implemented `traits` influencing patience and preferences)
 
+## Animated Walkthrough
+- [ ] Create an animated walkthrough tutorial for new players.
+    - [ ] Highlight and explain the function of each UI button.
+    - [ ] Demonstrate core game mechanics and functions.
+    - [ ] Provide clear guidance on how to achieve game objectives and win conditions.
+
 ## Submenus
 Create a submenu for each of the following showing relevant information:
 - [ ] Time
@@ -23,6 +29,12 @@ Create a submenu for each of the following showing relevant information:
     customer satisfaction effects/unlockables
 - [ ] Weather
 - [ ] Customers
+
+### Ingredients List
+- [ ] Create a list of ingredients that can be purchased in the game world.
+- [ ] Add a mechanism to track ingredient usage and display it in the UI.
+- [ ] Add a mechanism to track ingredient prices and display it in the UI.
+- [ ] Add a mechanism to track ingredient availability and display it in the UI (limited sources)
 
 ### Character AI
 - [ ] **Finite State Machines (FSMs)**: For simple, distinct behaviors (e.g., idle, conversation, unexpected actions).

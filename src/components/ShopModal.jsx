@@ -19,14 +19,19 @@ const UPGRADES = [
 ];
 
 const SKINS = [
-    { key: 'SKIN_WOOD', name: 'Rustic Wood', icon: '🪵', desc: 'A warm, natural look.', cost: 50.00 },
-    { key: 'SKIN_METAL', name: 'Industrial Metal', icon: '⚙️', desc: 'Sleek and modern.', cost: 150.00 },
-    { key: 'SKIN_MARBLE', name: 'Luxury Marble', icon: '🏛️', desc: 'Premium elegance.', cost: 200.00 }
+    { key: 'SKIN_WOOD', name: 'Rustic Wood Skin', icon: '🪵', desc: 'A warm, natural look.', cost: 50.00 },
+    { key: 'SKIN_METAL', name: 'Industrial Metal Skin', icon: '⚙️', desc: 'Sleek and modern.', cost: 150.00 },
+    { key: 'SKIN_MARBLE', name: 'Luxury Marble Skin', icon: '🏛️', desc: 'Premium elegance.', cost: 200.00 }
+];
+
+const COUNTERS = [
+    { key: 'COUNTER_WOOD', name: 'Wooden Counter', icon: '🪑', desc: 'Dark wood grain.', cost: 100.00 },
+    { key: 'COUNTER_MARBLE', name: 'Marble Counter', icon: '🏛️', desc: 'Clean white marble.', cost: 500.00 }
 ];
 
 const ShopModal = ({ isOpen, onClose, gameState, handleBuy, buyUpgrade }) => {
     const [activeTab, setActiveTab] = useState('supplies');
-    const { cash, stats, upgrades, decorations, activeSkin } = gameState;
+    const { cash, stats, upgrades, decorations, activeSkin, activeCounter } = gameState; // Added activeCounter
 
     // Get suggestions from game logic if available, or calculate locally (fallback)
     const suggestions = gameState.getShoppingSuggestions ? gameState.getShoppingSuggestions() : [];
@@ -97,7 +102,6 @@ const ShopModal = ({ isOpen, onClose, gameState, handleBuy, buyUpgrade }) => {
                         {UPGRADES.map(upgrade => {
                             const isOwned = upgrades.includes(upgrade.id);
                             const isLocked = stats.reputation < upgrade.rep;
-                            // const canAfford = cash >= upgrade.cost; // HARD MODE: Allow debt
 
                             return (
                                 <div key={upgrade.id} className={`shop-item ${isOwned ? 'owned' : ''} ${isLocked ? 'locked' : ''}`}>
@@ -125,19 +129,14 @@ const ShopModal = ({ isOpen, onClose, gameState, handleBuy, buyUpgrade }) => {
                 {activeTab === 'decors' && (
                     <div className="shop-items">
                         <div style={{ padding: '0.5rem', fontStyle: 'italic', textAlign: 'center', opacity: 0.8 }}>
-                            Customize your cart! Skins apply immediately.
+                            Customize your cart & workspace!
                         </div>
-                        {SKINS.map(skin => {
-                            // Map the SHOP key to the internal skin-key for checking ownership
-                            // BEANS_STD -> beans_standard mapping logic is inside handleBuy
-                            // But here we need to know the mapping to check 'decorations'.
-                            // Hardcoded mapping based on useInventory:
-                            // SKIN_WOOD -> skin-wood
-                            const skinId = skin.key.toLowerCase().replace('_', '-');
 
+                        <h4 style={{ margin: '10px 0 5px', borderBottom: '1px solid #ccc' }}>Cart Skins</h4>
+                        {SKINS.map(skin => {
+                            const skinId = skin.key.toLowerCase().replace('_', '-');
                             const isEquipped = activeSkin === skinId;
                             const isOwned = decorations.includes(skinId);
-                            // const canAfford = cash >= skin.cost; // HARD MODE
 
                             return (
                                 <div key={skin.key} className={`shop-item ${isEquipped ? 'equipped' : ''} ${isOwned ? 'owned' : ''}`}>
@@ -150,7 +149,33 @@ const ShopModal = ({ isOpen, onClose, gameState, handleBuy, buyUpgrade }) => {
                                     <button
                                         className="btn buy"
                                         onClick={() => handleBuy(skin.key, 1)}
-                                        disabled={isEquipped || (isOwned ? false : false)} // Always enabled if not equipped (logic handles equip vs buy)
+                                        disabled={isEquipped || (isOwned ? false : false)}
+                                        style={isEquipped ? { background: '#8d6e63', borderColor: '#5d4037' } : {}}
+                                    >
+                                        {isEquipped ? 'Equipped' : (isOwned ? 'Equip' : 'Buy')}
+                                    </button>
+                                </div>
+                            );
+                        })}
+
+                        <h4 style={{ margin: '15px 0 5px', borderBottom: '1px solid #ccc' }}>Workspace Upgrades</h4>
+                        {COUNTERS.map(item => {
+                            const itemId = item.key.toLowerCase();
+                            const isEquipped = activeCounter === itemId;
+                            const isOwned = decorations.includes(itemId);
+
+                            return (
+                                <div key={item.key} className={`shop-item ${isEquipped ? 'equipped' : ''} ${isOwned ? 'owned' : ''}`}>
+                                    <div className="icon">{item.icon}</div>
+                                    <div className="details">
+                                        <h3>{item.name}</h3>
+                                        <p>{item.desc}</p>
+                                        {isOwned ? null : <p className="cost">${item.cost.toFixed(2)}</p>}
+                                    </div>
+                                    <button
+                                        className="btn buy"
+                                        onClick={() => handleBuy(item.key, 1)}
+                                        disabled={isEquipped || (isOwned ? false : false)}
                                         style={isEquipped ? { background: '#8d6e63', borderColor: '#5d4037' } : {}}
                                     >
                                         {isEquipped ? 'Equipped' : (isOwned ? 'Equip' : 'Buy')}
@@ -161,7 +186,7 @@ const ShopModal = ({ isOpen, onClose, gameState, handleBuy, buyUpgrade }) => {
                     </div>
                 )}
             </div>
-        </Modal>
+        </Modal >
     );
 };
 

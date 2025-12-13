@@ -23,6 +23,7 @@ export const useInventory = (initialState) => {
         },
         decorations: [],
         activeSkin: 'skin-default',
+        activeCounter: 'counter_plastic', // NEW: Workspace texture
         upgrades: [],
         purchaseHistory: []
     });
@@ -75,7 +76,12 @@ export const useInventory = (initialState) => {
             'SKIN_WOOD': { key: 'skin-wood', cost: 50.00, name: 'Rustic Wood Skin', type: 'skin' },
             'SKIN_MARBLE': { key: 'skin-marble', cost: 200.00, name: 'Marble Skin', type: 'skin' },
             'SKIN_METAL': { key: 'skin-metal', cost: 150.00, name: 'Metal Skin', type: 'skin' },
-            'SKIN_DEFAULT': { key: 'skin-default', cost: 0, name: 'Default Skin', type: 'skin' } // For resetting
+            'SKIN_DEFAULT': { key: 'skin-default', cost: 0, name: 'Default Skin', type: 'skin' }, // For resetting
+
+            // COUNTERS (Workspaces)
+            'COUNTER_PLASTIC': { key: 'counter_plastic', cost: 0, name: 'Plastic Table', type: 'counter' },
+            'COUNTER_WOOD': { key: 'counter_wood', cost: 100.00, name: 'Wooden Counter', type: 'counter' },
+            'COUNTER_MARBLE': { key: 'counter_marble', cost: 500.00, name: 'Marble Counter', type: 'counter' }
         };
 
         const item = itemMap[itemKey];
@@ -86,10 +92,12 @@ export const useInventory = (initialState) => {
         let result = { success: false, item };
 
         setInventoryState(prev => {
-            // Check if already equipped/owned logic for skins
-            if (item.type === 'skin' && prev.decorations.includes(item.key)) {
+            // Check if already equipped/owned logic for skins/counters
+            if ((item.type === 'skin' || item.type === 'counter') && prev.decorations.includes(item.key)) {
                 // If owned, just equip
-                return { ...prev, activeSkin: item.key };
+                if (item.type === 'skin') return { ...prev, activeSkin: item.key };
+                if (item.type === 'counter') return { ...prev, activeCounter: item.key };
+                return prev;
             }
 
             // Removed strict checks for Harder Gameplay
@@ -102,12 +110,16 @@ export const useInventory = (initialState) => {
             const newInventory = { ...prev.inventory };
             const newDecorations = [...prev.decorations];
             let newActiveSkin = prev.activeSkin;
+            let newActiveCounter = prev.activeCounter;
 
             if (item.type === 'decoration') {
                 newDecorations.push(item.key);
             } else if (item.type === 'skin') {
                 newDecorations.push(item.key);
                 newActiveSkin = item.key; // Auto-equip on buy
+            } else if (item.type === 'counter') {
+                newDecorations.push(item.key);
+                newActiveCounter = item.key; // Auto-equip
             } else {
                 newInventory[item.key] += amount;
             }
@@ -120,6 +132,7 @@ export const useInventory = (initialState) => {
                 inventory: newInventory,
                 decorations: newDecorations,
                 activeSkin: newActiveSkin,
+                activeCounter: newActiveCounter,
                 purchaseHistory: [
                     ...prev.purchaseHistory,
                     { item: item.name, quantity: amount || 1, cost: item.cost, timestamp: Date.now() }
@@ -197,6 +210,7 @@ export const useInventory = (initialState) => {
             inventory: saved.inventory,
             decorations: saved.decorations,
             activeSkin: saved.activeSkin || 'skin-default',
+            activeCounter: saved.activeCounter || 'counter_plastic',
             upgrades: saved.upgrades,
             purchaseHistory: saved.purchaseHistory
         }));

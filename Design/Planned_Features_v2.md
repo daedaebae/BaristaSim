@@ -51,6 +51,10 @@
     - [ ] **TODO (BLOCKED)**: Generate missing HUD icons (Rep, Pantry).
 
 ## Upcoming Priorities (Phase 2.5)
+- **Game Mechanics**:
+    - [ ] Define win conditions (e.g., reach a certain reputation, serve X customers, achieve Y profit).
+    - [ ] Refine game loop (e.g., daily cycle, weekly goals, end-game trigger).
+
 - **Mobile**:
     - [ ] Mobile support (iOS, Android).
     - [ ] Mobile UI (touch controls, etc).

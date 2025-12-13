@@ -11,11 +11,13 @@ The classic brew.
 4.  **Stir**: Agitate the grounds for extraction.
 5.  **Plunge**: Push through the filter.
 6.  **Serve**: Hand it to the customer!
+    > [!IMPORTANT]
+    > **Water Temperature**: Always ensure water is **Hot** (Boiled) before adding! Serving coffee made with cold water results in a **Quality Penalty**.
 
 ### 2. Matcha Latte (Unlockable)
 A calming tea ceremony. *Requires "Matcha Kit" upgrade.*
 1.  **Sift Powder**: Prepare the fine matcha powder.
-2.  **Add Water**: Add hot water.
+2.  **Add Water**: Add hot water (Don't forget to boil!).
 3.  **Whisk**: Use the bamboo whisk to froth.
 4.  **Serve**: A smooth green delight.
 
@@ -67,6 +69,13 @@ Customize your cart's look!
 -   **Luxury Marble**: Premium elegance.
 *Purchased skins can be equipped from the Shop.*
 
+### 🪑 Workspace Upgrades (Counters)
+Change the look of your brewing station table!
+-   **Plastic Table**: The default basic table.
+-   **Wooden Counter**: A dark, rich wood grain. ($100)
+-   **Marble Counter**: Clean, premium marble surface. ($500)
+*Equip these new counters to change the texture of your workspace.*
+
 ---
 
 ## 🖥️ UI & Controls
@@ -79,6 +88,7 @@ We've optimized the interface for both desktop and mobile baristas.
 
 ### Visuals
 -   **Avatars**: Full-body pixel art avatars represent you and your customers.
+-   **Customization**: Click your **Name Bubble** above the barista to edit your **Name** and choose from different **Barista Avatars**.
 -   **Visibility**: The interface adapts to prevent the brewing station from hiding characters.
 
 ---
