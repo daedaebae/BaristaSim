@@ -35,6 +35,14 @@ function App() {
   // Expose game to window for debugging
   useEffect(() => {
     window.game = game;
+    // Start music on load, but NOT ambience
+    if (game.gameState.settings.musicEnabled && !game.gameState.settings.muteAll) {
+      // resume context first just in case (handled by playMusic in hook but good practice)
+      // Actually, playMusic in hook handles resume.
+      game.audio.playMusic();
+      // Explicitly ensure ambience is stopped or just don't call it.
+      // If we don't call playAmbience, it won't play.
+    }
   }, [game]);
 
   // Handle Dark Mode

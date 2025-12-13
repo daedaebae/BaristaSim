@@ -10,11 +10,12 @@ export class AudioSystem {
         this.sfxVolume = 0.1; // 10% volume
         this.ambienceVolume = 0.3; // 30% volume
         this.ambienceAudio = null;
-        this.playlist = [
-            `${BASE_URL}assets/music/music_lofi.mp3`,
-            `${BASE_URL}assets/music/synthesis.mp3`,
-            `${BASE_URL}assets/music/funkylofi.mp3`
-        ];
+        this.ambienceAudio = null;
+
+        // Dynamically load all mp3s from assets/music
+        const musicFiles = import.meta.glob('../assets/music/*.mp3', { eager: true });
+        this.playlist = Object.values(musicFiles).map(mod => mod.default);
+
         this.currentTrackIndex = 0;
         this.trackPlayCount = 0; // Track how many times the current song has played
     }

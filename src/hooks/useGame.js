@@ -625,6 +625,7 @@ export const useGame = (initialState) => {
 
     // COMPATIBILITY API (Must match original useGame return)
     return {
+        audio, // Expose audio helper directly
         gameState: {
             ...gameMeta,
             ...time.timeState, // time, day, minutesElapsed
