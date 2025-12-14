@@ -176,7 +176,7 @@ function App() {
       )}
 
       {uiState.activeModal === 'wiki' && (
-        <WikiModal close={() => toggleModal('wiki')} />
+        <WikiModal isOpen={true} onClose={() => toggleModal('wiki')} />
       )}
 
       {uiState.activeModal === 'avatar' && (
