@@ -73,7 +73,16 @@ export const useAudio = (initialSettings) => {
     const toggleMusic = useCallback((enabled) => {
         setSettings(prev => ({ ...prev, musicEnabled: enabled }));
         if (audioRef.current) {
-            if (enabled && !settings.muteAll) audioRef.current.playMusic();
+            if (enabled && !settings.muteAll) {
+                // Ensure context is resumed before playing
+                if (audioRef.current.context.state === 'suspended') {
+                    audioRef.current.context.resume().then(() => {
+                        audioRef.current.playMusic();
+                    }).catch(e => console.error("Audio resume failed on toggle", e));
+                } else {
+                    audioRef.current.playMusic();
+                }
+            }
             else audioRef.current.stopMusic();
         }
     }, [settings.muteAll]);
