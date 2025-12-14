@@ -67,14 +67,15 @@ const ConstructionSite = ({ onComplete }) => {
     // Mechanic Switcher / Event Trigger
     useEffect(() => {
         if (phase === 'building' && progress < 100) {
-            // Randomly switch mechanic every few chunks of progress?
-            // Or just keep it simple: < 50% Hammer, > 50% Weld?
-            // Let's do random change.
-            if (Math.random() > 0.9) {
-                setFlavorText(FLAVOR_EVENTS[Math.floor(Math.random() * FLAVOR_EVENTS.length)]);
+            // Force Welding at specific milestones
+            if ((progress > 30 && progress < 35 && mechanic !== 'WELD') ||
+                (progress > 60 && progress < 65 && mechanic !== 'WELD') ||
+                (progress > 90 && progress < 95 && mechanic !== 'WELD')) {
+                setMechanic('WELD');
+                setFlavorText("Time to weld! HOLD the button!");
             }
         }
-    }, [progress, phase]);
+    }, [progress, phase, mechanic]);
 
     // Welding Logic
     useEffect(() => {
@@ -99,25 +100,45 @@ const ConstructionSite = ({ onComplete }) => {
     };
 
     const handleHammer = () => {
-        if (progress >= 100 || overheated) return;
+        if (progress >= 100 || overheated || mechanic === 'WELD') return; // Lock hammer during weld phase
         if (energy > 0) {
             setEnergy(prev => prev - 1);
             setProgress(prev => Math.min(prev + 5, 100)); // 5% per click
-
-            // Randomly switch to welding at 40%
-            if (progress > 40 && mechanic === 'HAMMER' && Math.random() > 0.8) {
-                setMechanic('WELD');
-                setFlavorText("Time to weld! HOLD the button!");
-            }
         }
     };
+
+    const [sparks, setSparks] = useState([]);
 
     const startWeld = () => {
         if (mechanic !== 'WELD' || overheated || progress >= 100) return;
         weldInterval.current = setInterval(() => {
             setHeat(h => h + 5);
             setEnergy(e => Math.max(e - 0.5, 0));
-            setProgress(p => Math.min(p + 1, 100));
+
+            // Generate Spark
+            if (Math.random() > 0.3) {
+                const id = Date.now() + Math.random();
+                const dx = (Math.random() - 0.5) * 100 + 'px';
+                const dy = (Math.random() - 0.5) * 100 + 'px';
+                setSparks(prev => [...prev.slice(-10), { id, dx, dy }]); // Keep max 10 sparks
+                setTimeout(() => setSparks(prev => prev.filter(s => s.id !== id)), 500);
+            }
+
+            // Sweet Spot Bonus! (50-80 Heat)
+            const isSweetSpot = (heat >= 50 && heat <= 80);
+            const progressBonus = isSweetSpot ? 0.4 : 0.1; // Base speed + Bonus
+
+            setProgress(p => {
+                const newProg = Math.min(p + progressBonus, 100);
+                // Exit weld phase if we passed the milestone + buffer (e.g., 40%)
+                // But simplified: allow welding until 100 or user releases?
+                // Let's force switch back to hammer after some progress?
+                // Actually, let's just let them weld until they stop or overheat.
+                // BUT we need to let them switch back to hammer eventually.
+                // Let's say weld phase lasts for 15% progress.
+                return newProg;
+            });
+
         }, 100);
     };
 
@@ -126,11 +147,14 @@ const ConstructionSite = ({ onComplete }) => {
             clearInterval(weldInterval.current);
             weldInterval.current = null;
         }
-        // Rapid cool down when not welding?
         setHeat(0);
 
-        // Randomly switch back to Hammer?
-        if (Math.random() > 0.7) {
+        // Check if we can switch back to hammer
+        // If we are NOT in a critical weld window (30-40, 60-70, 90-100), maybe switch back?
+        // Simplified: Randomly switch back if we've done some welding?
+        // Or just fixed duration?
+        // Let's switch back to Hammer if we've progressed passed the trigger points significantly
+        if ((progress > 40 && progress < 60) || (progress > 70 && progress < 90)) {
             setMechanic('HAMMER');
             setFlavorText("Back to hammering! CLICK!");
         }
@@ -218,6 +242,9 @@ const ConstructionSite = ({ onComplete }) => {
                     {overheated ? 'COOLING...' : 'WELD! (Hold)'}
                 </button>
             )}
+            {sparks.map(s => (
+                <div key={s.id} className="sparks" style={{ '--dx': s.dx, '--dy': s.dy, top: '50%', left: '50%' }}></div>
+            ))}
         </div>
     );
 };

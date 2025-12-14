@@ -16,11 +16,11 @@
 6.  [x] Don't let values go negative.
 7.  [x] Pop up a message when an inventory item is used up.
 8.  [x] Fix Wiki/Barista Guide button functionality.
-9.  [ ] fix the Music controls bug!
-10.  [ ] Weld more in cart design
+9.  [x] fix the Music controls bug! (Fixed AudioContext resume logic)
+10.  [x] Weld more in cart design mini-game. (Added 3 obligatory weld phases + sparks)
 11.  [ ] Add "TutorialWalkthrough" feature to the current phase (pop ups explaining things)
 12.  [ ] Add the Creation of a comprehensive list of drinks that can be made to the current planned feature list. (simple coffee drinks are unlocked by default, but more complex drinks locked until milestones met)
-13.  [ ] Show wallet in shop so you can see what you need to buy!
+13.  [x] Show wallet in shop so you can see what you need to buy! (Enhanced styling)
 14.  [ ] Create a pop-up alert when you run out of supplies.
 15.  [ ] Shop idea - LostCo, get lost in the savings!
 16.  [ ] Add this Customer sentiment idea to the future features doc: customer sentiments change before/after having coffee (before any coffee some are cranky, after coffee some are jittery and happy)
