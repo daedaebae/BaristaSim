@@ -10,7 +10,10 @@
     - [x]  Add more button mechanics for the cart customization.
     - [ ]  Make it a little harder to build the cart.
 3.  [ ] graphics are not currently mobile friendly. Make this a priority. Fix the layout so the mobile view shows all elements in portrait and/or landscape on a pixel 6 screen or bigger.
+    - [x] Fixed scrolling issues in Cart Designer for mobile.
 4.  [ ] Speed up time a little to make the days end faster.
 5.  [ ] Make the game a little more challenging.
-6.  [ ] 
+6.  [x] Don't let values go negative.
+7.  [x] Pop up a message when an inventory item is used up.
+8.  [x] Fix Wiki/Barista Guide button functionality. 
 ## Resolved Items (Moved to Resolved/Fix_First_*.md)
