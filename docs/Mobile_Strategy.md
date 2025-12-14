@@ -15,6 +15,8 @@ The current UI is desktop-first. We need to adapt it for small screens.
     -   Minimum button size: 44px x 44px (Apple guidelines).
     -   Add padding to inputs and inventory items.
     -   [x] **Sourcing Screen**: Added vertical scroll for Cart Designer options.
+- [x] Fix: Wiki/Barista Guide Button
+    - [x] Correct props in `App.jsx` (`isOpen`, `onClose`)
 
 ## 2. Layout Strategy (Mobile V2)
 -   **Brewing Station**: Centered and scaled down significantly to fit. Moved up to clear controls.
