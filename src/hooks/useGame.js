@@ -619,7 +619,7 @@ export const useGame = (initialState) => {
             else if (difficulty === 'extreme') intervalTime = 66; // Faster (1.5x)
 
             interval = setInterval(() => {
-                advanceTimeWrapper(0.1); // Smaller tick
+                advanceTimeWrapper(0.2); // Faster tick (Speed up days)
             }, intervalTime);
         }
         return () => clearInterval(interval);
