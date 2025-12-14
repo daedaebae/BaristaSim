@@ -1,5 +1,5 @@
-import pixelBarista from '../assets/characters/pixel_barista_neutral.png';
-import baristaAvatars from '../assets/characters/barista_avatars.png';
+import pixelBarista from '../assets/characters/baristas/pixel_barista_neutral.png';
+import baristaAvatars from '../assets/characters/baristas/barista_avatars.png';
 
 export default function CharacterArea({ currentCustomer, minutesElapsed, playerName, playerAvatar, onEditProfile, renderMode = 'full' }) {
     // Determine Avatar

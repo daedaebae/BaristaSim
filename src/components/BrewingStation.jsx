@@ -90,7 +90,7 @@ export const BrewingControls = ({ gameState, handleBrewAction, performServe, tog
         <div id="controls-area" className="controls-area">
             {mode === 'coffee' && (
                 <div id="coffee-controls" className="control-group">
-                    <Tooltip text="Heat water to 200°F">
+                    <Tooltip text="Heat water to 200F">
                         <button className="btn" onClick={() => handleBrewAction('BOIL')}>
                             {isBoiling ? 'Boiling...' : 'Boil Water'}
                         </button>

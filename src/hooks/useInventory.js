@@ -188,12 +188,23 @@ export const useInventory = (initialState) => {
     const deductResources = useCallback((deductions) => {
         // deductions = { beans_standard: 20, water: 250 }
         let success = true;
-        setInventoryState(prev => {
-            // Removed strict check for Harder Gameplay
-            // Allow negative inventory
 
+        // 1. Check Sufficiency
+        const currentInv = { ...inventoryState.inventory };
+        for (const [key, val] of Object.entries(deductions)) {
+            if ((currentInv[key] || 0) < val) {
+                success = false;
+                break;
+            }
+        }
+
+        if (!success) return false;
+
+        // 2. Deduct
+        setInventoryState(prev => {
             const newInv = { ...prev.inventory };
             const newUsage = { ...prev.resourceUsage };
+
             for (const [key, val] of Object.entries(deductions)) {
                 newInv[key] -= val;
 
@@ -211,8 +222,8 @@ export const useInventory = (initialState) => {
                 resourceUsage: newUsage
             };
         });
-        return true; // Always return success
-    }, []);
+        return true;
+    }, [inventoryState.inventory]);
 
     const syncInventoryState = useCallback((saved) => {
         setInventoryState(prev => ({

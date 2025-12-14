@@ -1,3 +1,13 @@
+import aliceImg from '../assets/characters/customers/alice.png';
+import bobImg from '../assets/characters/customers/bob.png';
+import charlieImg from '../assets/characters/customers/gus.png';
+// import danaImg from '../assets/characters/customers/dana.png'; // distinct look
+import eveImg from '../assets/characters/customers/eve.png'; // Distinct look
+import frankImg from '../assets/characters/customers/frank.png'; // distinct look
+
+import gusImg from '../assets/characters/customers/gus.png';
+import helenImg from '../assets/characters/customers/helen.png';
+import ianImg from '../assets/characters/customers/ian.png';
 
 export const CHARACTER_ROSTER = [
     {
@@ -8,7 +18,8 @@ export const CHARACTER_ROSTER = [
         traits: ['Creative', 'Patient'],
         preferences: { drink: 'Matcha Latte', milk: 'Oat' },
         basePatience: 25,
-        tippingBehavior: 'generous'
+        tippingBehavior: 'generous',
+        avatar: aliceImg
     },
     {
         id: 'bob',
@@ -18,7 +29,8 @@ export const CHARACTER_ROSTER = [
         traits: ['Busy', 'Direct'],
         preferences: { drink: 'Espresso', milk: 'Whole' },
         basePatience: 15,
-        tippingBehavior: 'standard'
+        tippingBehavior: 'standard',
+        avatar: bobImg
     },
     {
         id: 'charlie',
@@ -28,7 +40,8 @@ export const CHARACTER_ROSTER = [
         traits: ['Trendy', 'Impatient'],
         preferences: { drink: 'Matcha Latte', milk: 'Soy' },
         basePatience: 18,
-        tippingBehavior: 'erratic'
+        tippingBehavior: 'erratic',
+        avatar: charlieImg
     },
     {
         id: 'dana',
@@ -38,7 +51,8 @@ export const CHARACTER_ROSTER = [
         traits: ['Focused', 'Techie'],
         preferences: { drink: 'Coffee', milk: 'Almond' },
         basePatience: 30,
-        tippingBehavior: 'standard'
+        tippingBehavior: 'standard',
+        avatar: eveImg
     },
     {
         id: 'eve',
@@ -48,7 +62,8 @@ export const CHARACTER_ROSTER = [
         traits: ['Health-Conscious', 'Friendly'],
         preferences: { drink: 'Matcha Latte', milk: 'Almond' },
         basePatience: 22,
-        tippingBehavior: 'generous'
+        tippingBehavior: 'generous',
+        avatar: eveImg
     },
     {
         id: 'frank',
@@ -58,7 +73,41 @@ export const CHARACTER_ROSTER = [
         traits: ['Chatty', 'Loyal'],
         preferences: { drink: 'Coffee', milk: 'Whole' },
         basePatience: 40,
-        tippingBehavior: 'standard'
+        tippingBehavior: 'standard',
+        avatar: frankImg
+    },
+    {
+        id: 'gus',
+        name: 'Gus',
+        age: 27,
+        bio: 'An indie game developer with a love for obscure 8-bit soundtracks.',
+        traits: ['Hipster', 'Chill'],
+        preferences: { drink: 'Coffee', milk: 'Oat' },
+        basePatience: 35,
+        tippingBehavior: 'good',
+        avatar: gusImg
+    },
+    {
+        id: 'helen',
+        name: 'Helen',
+        age: 72,
+        bio: 'A knitting enthusiast who enjoys watching the world go by.',
+        traits: ['Kind', 'Patient'],
+        preferences: { drink: 'Matcha Latte', milk: 'Whole' },
+        basePatience: 50,
+        tippingBehavior: 'generous',
+        avatar: helenImg
+    },
+    {
+        id: 'ian',
+        name: 'Ian',
+        age: 21,
+        bio: 'A music production student always lost in his headphones.',
+        traits: ['Quiet', 'Focused'],
+        preferences: { drink: 'Espresso', milk: 'Soy' },
+        basePatience: 20,
+        tippingBehavior: 'standard',
+        avatar: ianImg
     }
 ];
 

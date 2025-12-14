@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Modal from './Modal';
 
-const DebugModal = ({ gameState, startGame, advanceTime, isOpen, onClose }) => {
+const DebugModal = ({ gameState, startGame, advanceTime, toggleModal, isOpen, onClose }) => {
     // Local state for collapsed sections to manage vertical space
     const [showLogs, setShowLogs] = useState(false);
     const [showState, setShowState] = useState(false);
@@ -9,10 +9,23 @@ const DebugModal = ({ gameState, startGame, advanceTime, isOpen, onClose }) => {
     return (
         <Modal isOpen={isOpen} onClose={onClose} title="Debug Controls">
             <div style={{ padding: '0 10px', fontFamily: 'monospace', fontSize: '0.9rem' }}>
-                <div style={{ display: 'flex', gap: '10px', marginBottom: '1rem' }}>
+                <div style={{ display: 'flex', gap: '10px', marginBottom: '1rem', flexWrap: 'wrap' }}>
                     <button className="btn nav" onClick={() => startGame('DebugPlayer')}>Start Game</button>
                     <button className="btn nav" onClick={() => advanceTime(10)}>+10m</button>
                     <button className="btn nav" onClick={() => advanceTime(60)}>+1h</button>
+                </div>
+
+                <div className="menu-group" style={{ marginBottom: '1rem' }}>
+                    <h4 style={{ margin: '0 0 0.5rem 0', borderBottom: '1px solid #ccc' }}>Test Modals</h4>
+                    <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
+                        <button className="btn" style={{ fontSize: '0.8rem' }} onClick={() => toggleModal('shop')}>Shop</button>
+                        <button className="btn" style={{ fontSize: '0.8rem' }} onClick={() => toggleModal('inventory')}>Pantry</button>
+                        <button className="btn" style={{ fontSize: '0.8rem' }} onClick={() => toggleModal('financials')}>Finances</button>
+                        <button className="btn" style={{ fontSize: '0.8rem' }} onClick={() => toggleModal('reputation')}>Reputation</button>
+                        <button className="btn" style={{ fontSize: '0.8rem' }} onClick={() => toggleModal('calendar')}>Calendar</button>
+                        <button className="btn" style={{ fontSize: '0.8rem' }} onClick={() => toggleModal('customers')}>Customers</button>
+                        <button className="btn" style={{ fontSize: '0.8rem' }} onClick={() => toggleModal('designer')}>Cart Designer</button>
+                    </div>
                 </div>
 
                 <div className="menu-group" style={{ background: '#eee', padding: '10px', borderRadius: '4px' }}>

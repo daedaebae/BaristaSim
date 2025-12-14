@@ -17,7 +17,7 @@ export const useTime = (initialState) => {
                     resolve(prev);
                     return prev;
                 }
-                if (prev.minutesElapsed >= 480) { // 5:00 AM + 480 mins = 1:00 PM
+                if (prev.minutesElapsed >= 780) { // 5:00 AM + 780 mins = 6:00 PM (18:00)
                     resolve(prev);
                     return prev;
                 }

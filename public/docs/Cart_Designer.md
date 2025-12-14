@@ -13,10 +13,24 @@ Choose your starting archetype. This choice is permanent for the save file!
 | **Micro-Luxe** (Trailer) | High Tips, Premium Vibe | High Cost | Min-maxers, Perfectionists |
 
 ## 🔨 Phase 2: Construction Site
-Building a cart takes sweat equity. 
-*   **Energy**: You have a limited pool of energy. It regenerates over time.
-*   **Action**: Click the **HAMMER!** button to spend energy and build progress.
-*   **Goal**: Reach 100% progress to finish the chassis.
+Turn your blueprint into reality. This phase is interactive and features multiple construction mechanics.
+
+### 1. Sourcing Materials
+Before building, you must choose where your parts come from. This affects your starting reputation and build quality.
+*   **Dumpster Dive** (Free): High risk, low quality.
+*   **Generic Hardware** ($100): Standard parts.
+*   **Artisan Crafted** ($500): Premium quality, high aesthetic appeal.
+
+### 2. The Build
+*   **Mechanics**:
+    *   **Hammer! (Click)**: Rapid clicking to build progress. Consumes Energy.
+    *   **Weld! (Hold)**: Hold the button to weld. Builds progress faster but generates **Heat**.
+*   **Hazards**:
+    *   **Overheating**: If you weld too long, the tool overheats and enforces a cooldown.
+    *   **Events**: Watch for humorous flavor text events (e.g., "Ouch! Thumb!").
+*   **Goal**: Reach 100% progress.
+
+> **Mobile Tip**: On mobile devices, use the scroll feature to view all sourcing options.
 
 ## 🚀 Phase 3: Launch Pad
 Finalize your business identity.

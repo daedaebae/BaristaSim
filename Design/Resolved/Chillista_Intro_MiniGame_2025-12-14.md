@@ -1,4 +1,4 @@
-# Chillista Origins: The Cart Builder
+# Chillista Intro: The Cart Builder
 **Proposal for a Prequel Mini-Game**
 
 ## Overview
@@ -6,29 +6,59 @@ Before the first cup is served, the cart must be built. This mini-game focuses o
 
 ---
 
+## Implementation Checklist
+
+*   [x] Overall Game Concept: Chillista Intro: The Cart Builder
+*   [x] Phase 1: The Blueprint (Design Options)
+    *   [x] Option A: The "Velo-Barista" (Cargo Bike)
+    *   [x] Option B: The "Sidewalk Hacker" (Upcycled Push-Cart)
+    *   [x] Option C: The "Micro-Luxe" (Converted Piaggio/Trailer)
+*   [x] Phase 2: The Build (Construction Gameplay)
+    *   [x] Mechanics: Construction Actions (Energy, Money)
+        *   [x] Sourcing Materials (Dumpster Dive, Marketplace Scour, Premium Supplier)
+        *   [x] Assembly Minigames (Sawing/Cutting, Painting, Plumbing)
+    *   [x] Customization Choices
+        *   [x] Power Source (Car Battery, Gas Generator, Solar Roof)
+        *   [x] Water System (Gravity fed, Pressure Pump)
+*   [x] Phase 3: The Launch (Implementation)
+    *   [x] Bureaucracy & Branding
+        *   [x] The Permit Puzzle
+        *   [x] Brand Identity (Logo Creator, Social Media Hype)
+            *   [x] Insta-Glam strategy
+            *   [x] Tok-Trend strategy
+            *   [x] Local-Blog strategy
+*   [x] Integration with Chillista (Main Game)
+    *   [x] Save File generation
+    *   [x] Starting Skin
+    *   [x] Starting Perks (Eco-Bike, Street Cart, Luxe Cart)
+    *   [x] Starting Debt
+*   [x] Global Inspiration Gallery
+
+---
+
 ## Phase 1: The Blueprint (Design Options)
 *Choose your chassis. This defines your mobility, capacity, and initial vibe.*
 
 ### Option A: The "Velo-Barista" (Cargo Bike)
-* **Inspiration:** Copenhagen / Portland / Amsterdam
-* **Description:** A heavy-duty, reverse-trike cargo bicycle modified to hold an espresso machine on the front box.
-* **Pros:** High Mobility, No Fuel Costs, "Eco-Friendly" Reputation Bonus.
-* **Cons:** Limited Inventory Space, Low Water Capacity.
-* **Aesthetic:** Light pine wood, matte black frame, leather geometric panniers.
+*   **Inspiration:** Copenhagen / Portland / Amsterdam
+*   **Description:** A heavy-duty, reverse-trike cargo bicycle modified to hold an espresso machine on the front box.
+*   **Pros:** High Mobility, No Fuel Costs, "Eco-Friendly" Reputation Bonus.
+*   **Cons:** Limited Inventory Space, Low Water Capacity.
+*   **Aesthetic:** Light pine wood, matte black frame, leather geometric panniers.
 
 ### Option B: The "Sidewalk Hacker" (Upcycled Push-Cart)
-* **Inspiration:** Bangkok / Berlin / Mexico City
-* **Description:** A salvaged industrial cart or modified hawker stall welded with custom shelving and a roof.
-* **Pros:** High Durability, Customizable Layout, "Street Cred" Reputation Bonus.
-* **Cons:** Heavy to move, requires flat ground.
-* **Aesthetic:** Corrugated metal, neon signage, sticker-bombed surfaces, milk crate shelving.
+*   **Inspiration:** Bangkok / Berlin / Mexico City
+*   **Description:** A salvaged industrial cart or modified hawker stall welded with custom shelving and a roof.
+*   **Pros:** High Durability, Customizable Layout, "Street Cred" Reputation Bonus.
+*   **Cons:** Heavy to move, requires flat ground.
+*   **Aesthetic:** Corrugated metal, neon signage, sticker-bombed surfaces, milk crate shelving.
 
 ### Option C: The "Micro-Luxe" (Converted Piaggio/Trailer)
-* **Inspiration:** Rome / Tokyo / Paris
-* **Description:** A tiny, vintage three-wheeled vehicle or teardrop trailer stripped and refitted with marble surfaces.
-* **Pros:** High Appeal (starts with higher prices), Weather Protection, "Premium" Reputation Bonus.
-* **Cons:** High Startup Cost, Fuel/Maintenance required.
-* **Aesthetic:** Pastel gloss paint, brass fittings, marble countertop, pinstriping.
+*   **Inspiration:** Rome / Tokyo / Paris
+*   **Description:** A tiny, vintage three-wheeled vehicle or teardrop trailer stripped and refitted with marble surfaces.
+*   **Pros:** High Appeal (starts with higher prices), Weather Protection, "Premium" Reputation Bonus.
+*   **Cons:** High Startup Cost, Fuel/Maintenance required.
+*   **Aesthetic:** Pastel gloss paint, brass fittings, marble countertop, pinstriping.
 
 ---
 

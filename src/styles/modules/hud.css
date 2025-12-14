@@ -170,20 +170,62 @@
     background: #fff;
 }
 
-/* Mobile Bottom Nav */
+/* Mobile Bottom Nav - REFACTORED to TOP RIGHT to avoid overlap */
 @media (max-width: 768px) {
     .floating-controls {
-        bottom: 10px;
-        right: 0;
-        left: 0;
-        flex-direction: row;
-        justify-content: center;
-        width: 100%;
-        background: rgba(0, 0, 0, 0.2);
-        /* Subtle backing */
-        padding: 5px 0;
-        backdrop-filter: blur(2px);
-        gap: 20px;
+        bottom: auto;
+        /* Unset bottom */
+        top: 60px;
+        /* Below HUD (approx 50px height) */
+        right: 10px;
+        left: auto;
+        /* Unset left */
+        flex-direction: column;
+        /* Stack vertically like desktop */
+        justify-content: flex-start;
+        width: auto;
+        /* Auto width */
+        background: transparent;
+        /* Remove bar background */
+        padding: 0;
+        backdrop-filter: none;
+        gap: 10px;
+    }
+
+    /* Make buttons slightly smaller on mobile */
+    .music-toggle,
+    .skip-toggle,
+    .settings-toggle,
+    .wiki-toggle {
+        width: 38px;
+        height: 38px;
+        font-size: 1rem;
+    }
+}
+
+/* Small Mobile (Pixel/iPhone SE) - Aggressive Compacting */
+@media (max-width: 400px) {
+    .hud-horizontal {
+        padding: 0.2rem 0.4rem;
+        /* Tight padding */
+        gap: 0.2rem;
+    }
+
+    .hud-item {
+        padding: 0.2rem 0.4rem;
+        font-size: 0.75rem;
+        /* Smaller text */
+        min-height: 36px;
+    }
+
+    .hud-icon {
+        width: 24px;
+        height: 24px;
+        font-size: 1.2rem;
+    }
+
+    .hud-value {
+        font-size: 0.8rem;
     }
 }
 

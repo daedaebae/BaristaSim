@@ -439,6 +439,8 @@
     padding-bottom: 20px;
     transition: all 0.3s ease;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+    transform: translateX(-50%) scale(0.65);
+    transform-origin: bottom center;
 }
 
 /* Workspace Textures */
@@ -1454,25 +1456,60 @@
         transform-origin: bottom center;
     }
 
-    /* Adjust controls area */
+    /* 4. Controls - Horizontal Scroll Strip */
     .controls-area {
-        padding: 0.5rem;
-        min-height: 80px;
+        padding: 0.2rem;
+        gap: 0.5rem;
+        min-height: 70px;
+        background: rgba(210, 180, 140, 0.9);
+        /* More opaque for contrast */
+        z-index: 100;
+        padding-bottom: env(safe-area-inset-bottom, 10px);
+        /* Handle Home Bar */
+        margin-bottom: 0;
     }
 
     .control-group {
         gap: 0.5rem;
-        /* Tighter gap */
         justify-content: flex-start;
-        /* Align start for scroll */
+        /* Alignment for scroll */
+        padding-left: 10px;
+        padding-right: 10px;
+        overflow-x: auto;
+        /* Enable scrolling */
+        width: 100%;
+        /* Take full width */
+        -webkit-overflow-scrolling: touch;
+        /* Smooth scroll */
     }
 
     .btn {
-        font-size: 1rem;
-        padding: 0.6rem;
-        /* Larger touch area */
-        min-height: 44px;
-        /* Standard touch target size */
+        min-width: 80px;
+        height: 50px;
+        font-size: 0.8rem;
+        line-height: 1.1;
+        padding: 2px;
+        white-space: normal;
+        flex-shrink: 0;
+        /* Don't squash buttons */
+    }
+
+    /* Small Mobile Scaling (<400px) */
+    @media (max-width: 400px) {
+        .brewing-station {
+            transform: translateX(-50%) scale(0.75);
+            /* Schrink for small height */
+            bottom: 90px;
+            /* Lower to clear HUD/Avatars */
+            width: 300px;
+            /* Adjust width basis */
+        }
+
+        .dialogue-box {
+            top: 60px;
+            /* Push higher */
+            font-size: 0.8rem;
+        }
     }
 
     .arrow {
@@ -1886,76 +1923,101 @@
         bottom: 5px;
     }
 }
-/* --- MOBILE REFACTORING --- */
+
+/* --- MOBILE REFACTORING V2 --- */
 @media (max-width: 768px) {
-    /* 1. Brewing Station Sizing */
+
+    /* 1. Layout Structure */
+    .work-space {
+        padding-top: 50px;
+        /* Reduced top padding */
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+    }
+
+    /* 2. Brewing Station - Centered & Scaled */
     .brewing-station {
-        width: 90%;
-        max-width: 360px;
-        height: 480px; /* Reducing height slightly */
-        bottom: 120px; /* Lift up to clear controls */
-    }
-
-    /* Adjust internals */
-    .aeropress {
-        transform: translateX(-50%) scale(0.85);
-        bottom: 100px;
-    }
-    
-    .kettle {
-        transform: scale(0.7);
-        top: -40px;
-        right: -60px;
-    }
-
-    /* 2. Character Area Overlap */
-    .character-area {
-        padding: 0 5px;
-        bottom: 100px; /* Match station bottom roughly */
-    }
-
-    .avatar {
-        width: 80px;
-        height: 80px;
+        width: 280px;
+        /* Fixed mobile width */
+        height: 400px;
+        /* Shorter */
+        bottom: 130px;
+        /* Clear controls */
+        left: 50%;
+        transform: translateX(-50%);
         border-width: 3px;
     }
 
+    .aeropress {
+        transform: translateX(-50%) scale(0.8);
+        bottom: 80px;
+    }
+
+    .kettle {
+        transform: scale(0.6);
+        right: -40px;
+        top: -30px;
+    }
+
+    /* 3. Avatars - MOVED TO TOP to avoid clutter */
+    .character-area {
+        position: absolute;
+        top: 80px;
+        /* Increased from 60px to clear HUD */
+        bottom: auto;
+        height: auto;
+        padding: 0 10px;
+        align-items: flex-start;
+        /* Align to top */
+        pointer-events: none;
+        /* Let clicks pass */
+    }
+
+    .avatar {
+        width: 70px;
+        height: 70px;
+        border-width: 2px;
+        pointer-events: auto;
+        /* Re-enable clicks on avatars */
+    }
+
+    .avatar.customer {
+        margin-left: 0;
+        align-self: flex-start;
+    }
+
+    .avatar.barista {
+        margin-right: 0;
+        display: none;
+        /* Optional: Hide barista on small mobile to save space? Or keep small? Let's keep small. */
+    }
+
+    /* Customer Info Panel - Moved BELOW avatars (80px + 70px + gap) */
     .customer-info-panel {
-        top: -100px; /* Push higher */
-        min-width: 150px;
-        font-size: 0.9rem;
+        top: 160px;
+        /* Clear the avatars */
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90%;
+        /* Use more width */
+        max-width: 300px;
     }
 
-    /* 3. Controls & Log */
-    .controls-area {
-        padding: 0.4rem;
-        gap: 0.4rem;
-        min-height: 80px;
-    }
-
-    .game-log {
-        height: 120px; /* Drastically reduce log height */
-        font-size: 0.85rem;
-        padding: 0.4rem;
-    }
-
-    .btn {
-        font-size: 0.9rem;
-        padding: 0.4rem 0.8rem;
-        min-height: 36px;
-    }
-    
-    .btn .arrow {
-        font-size: 1.5rem;
-    }
-
-    /* 4. Dialogue Box */
+    /* 6. Dialogue - Moved to TOP to avoid covering lower station/controls */
     .dialogue-box {
-        bottom: 100px; /* Move up */
+        bottom: auto;
+        top: 70px;
+        /* Just below HUD */
         width: 95%;
+        left: 50%;
+        transform: translateX(-50%);
         padding: 0.5rem;
-    }
-    .dialogue-text {
-        font-size: 1rem;
+        font-size: 0.9rem;
+        z-index: 200;
+        /* High z-index to sit over avatars if needed */
+        background: rgba(255, 255, 255, 0.95);
+        border: 2px solid #5d4037;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
     }
 }

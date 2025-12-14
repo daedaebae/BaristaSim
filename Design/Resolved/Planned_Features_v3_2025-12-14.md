@@ -43,3 +43,9 @@ Create a submenu for each of the following showing relevant information:
 - [ ] **Pathfinding & Navigation**: To enable characters to move intelligently through the game world.
 - [ ] **Social AI**: To manage interactions, relationships, and dialogue choices between characters.
 - [ ] **Emotional AI**: To simulate emotional responses and reactions to player and environmental stimuli.
+
+## Variable GUI Themes (Far Future)
+Dynamically adjust the game's UI theme based on the selected Cart Type:
+- [ ] **Eco-Friendly Theme** (Velo-Barista): Earth tones, leafy accents, recycled paper textures.
+- [ ] **Synth84 Hacker Theme** (Sidewalk Hacker): Dark mode, neon greens/purples, terminal font, glitch effects.
+- [ ] **Ritzy / High-End Theme** (Micro-Luxe): Gold accents, marble textures, serif fonts, sleek animations.

@@ -40,14 +40,40 @@ const InventoryModal = ({ isOpen, onClose, gameState }) => {
                             if (!info) return null; // Skip unknown items
                             if (amount <= 0 && !['beans_standard', 'water', 'cups'].includes(key)) return null; // Hide some empty items
 
+                            const MAX_CAPACITY = {
+                                beans_standard: 2000,
+                                beans_premium: 1000,
+                                matcha_powder: 500,
+                                water: 5000,
+                                milk: 3000,
+                                cups: 500,
+                                filters: 500
+                            };
+                            const max = MAX_CAPACITY[key] || 1000;
+                            const percentage = Math.min(100, Math.max(0, (amount / max) * 100));
+
+                            // Color coding
+                            let barColor = '#4caf50'; // Green
+                            if (percentage < 20) barColor = '#f44336'; // Red
+                            else if (percentage < 50) barColor = '#ff9800'; // Orange
+
                             return (
-                                <div key={key} className="inventory-item">
+                                <div key={key} className="inventory-item" style={{ minWidth: '120px' }}>
                                     <div className="icon" style={{ fontSize: '2rem' }}>{info.icon}</div>
-                                    <div className="details" style={{ textAlign: 'center' }}>
+                                    <div className="details" style={{ textAlign: 'center', width: '100%' }}>
                                         <h3 style={{ fontSize: '1rem', margin: '0.5rem 0' }}>{info.name}</h3>
-                                        <p style={{ fontFamily: 'monospace', fontSize: '1.1rem' }}>
-                                            {amount}{info.unit}
-                                        </p>
+                                        <div style={{ fontFamily: 'monospace', fontSize: '1.1rem', marginBottom: '4px' }}>
+                                            {amount} <span style={{ fontSize: '0.8em', color: '#666' }}>/{max}{info.unit}</span>
+                                        </div>
+                                        {/* Bar */}
+                                        <div style={{ width: '100%', height: '8px', background: '#ddd', borderRadius: '4px', overflow: 'hidden', border: '1px solid #999' }}>
+                                            <div style={{
+                                                width: `${percentage}%`,
+                                                height: '100%',
+                                                background: barColor,
+                                                transition: 'width 0.3s ease'
+                                            }} />
+                                        </div>
                                     </div>
                                 </div>
                             );

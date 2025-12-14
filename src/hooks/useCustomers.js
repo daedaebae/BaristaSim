@@ -1,6 +1,6 @@
 
 import { useState, useCallback, useMemo } from 'react';
-import pixelCustomer1 from '../assets/characters/pixel_customer_1.png';
+import pixelCustomer1 from '../assets/characters/customers/gus.png';
 import { CHARACTER_ROSTER } from '../data/characters';
 
 export const useCustomers = () => {
@@ -72,7 +72,8 @@ export const useCustomers = () => {
             const characterTemplate = CHARACTER_ROSTER[Math.floor(Math.random() * CHARACTER_ROSTER.length)];
 
             const name = characterTemplate.name; // Use roster name
-            const avatar = pixelCustomer1; // Still using placeholder avatar for now
+            // Use avatar from template, fallback to placeholder if missing
+            const avatar = characterTemplate.avatar || pixelCustomer1;
 
             // Determine type based on traits for legacy logic, or map traits to type
             let specialType = 'default';

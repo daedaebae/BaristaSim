@@ -12,6 +12,7 @@ const CustomersModal = ({ gameState, close }) => {
                     <div className="roster-grid">
                         {CHARACTER_ROSTER.map(char => (
                             <div key={char.id} className="roster-card">
+                                <img src={char.avatar} alt={char.name} className="roster-avatar" />
                                 <div className="roster-name">{char.name}</div>
                                 <div className="roster-info">{char.age} • {char.traits.join(', ')}</div>
                                 <div className="roster-fav">❤️ {char.preferences.type}</div>

@@ -12,13 +12,16 @@ The current UI is desktop-first. We need to adapt it for small screens.
     -   Minimum button size: 44px x 44px (Apple guidelines).
     -   Add padding to inputs and inventory items.
 
-## 2. Controls & Gameplay
--   **Brewing**: Manual clicking might be tedious on touch.
-    -   *Idea*: Tap-and-hold to pour water / grind?
-    -   *Idea*: Swipe gestures for "Plunging"?
--   **Navigation**:
-    -   Replace top-right buttons with a **Bottom Navigation Bar** or **Hamburger Menu**.
-    -   Ensure modals fill the screen comfortably (avoid tiny popups).
+    -   Minimum button size: 44px x 44px (Apple guidelines).
+    -   Add padding to inputs and inventory items.
+    -   [x] **Sourcing Screen**: Added vertical scroll for Cart Designer options.
+
+## 2. Layout Strategy (Mobile V2)
+-   **Brewing Station**: Centered and scaled down significantly to fit. Moved up to clear controls.
+-   **Avatars**: Moved to the **TOP** of the screen (below HUD) to avoid cluttering the work area.
+-   **Controls**: Horizontal scrolling strip at the bottom.
+-   **Log**: Compact overlay above controls.
+-   **HUD**: Scrollable horizontal bar.
 
 ## 3. Testing Plan
 -   **Devices**:

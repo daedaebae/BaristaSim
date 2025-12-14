@@ -201,6 +201,15 @@ function App() {
         unlockedModes={game.gameState.upgrades}
       />
 
+      {/* Day Summary Modal */}
+      {uiState.activeModal === 'summary' && (
+        <DaySummaryModal
+          isOpen={true}
+          stats={game.gameState.stats}
+          onStartNextDay={game.startNewDay}
+        />
+      )}
+
       {/* Floating Controls */}
       <div className="floating-controls">
         <Tooltip text={game.gameState.settings.musicEnabled ? "Mute Music" : "Play Music"} placement="left">

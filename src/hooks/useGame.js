@@ -194,9 +194,9 @@ export const useGame = (initialState) => {
             }
 
             // 3. End of Day Check
-            if (newTimeState.minutesElapsed >= 480 && uiState.activeModal !== 'summary') {
+            if (newTimeState.minutesElapsed >= 780 && uiState.activeModal !== 'summary') {
                 setUiState(prev => ({ ...prev, activeModal: 'summary' }));
-                if (!audio.settings.muteAll) audio.playSound('success');
+                audio.playMusic('chill_vibes'); // Revert to chill music for summary if needed
             }
         });
     }, [gameMeta.debug, time, customers, inventory.inventoryState, addLog, audio.settings.muteAll, audio.playSound, uiState.activeModal]);
@@ -237,10 +237,8 @@ export const useGame = (initialState) => {
                     addLog("Beans ground.", 'success');
                     audio.playSound('grind');
                 } else {
-                    addLog("Not enough beans! (Still ground air...)", 'error'); // Or just fail silent? User said "allow making mistakes".
-                    // If we failed deduct, we still allow action? 
-                    // deductResources now returns TRUE always (negative inv). So this block always runs!
-                    // The "else" block is now unreachable with my useInventory change.
+                    addLog("Out of Standard Beans!", 'error');
+                    audio.playSound('error');
                 }
             }
             else if (action === 'ADD_WATER') {
@@ -252,6 +250,9 @@ export const useGame = (initialState) => {
                         addLog("Added COLD water...", 'neutral');
                     }
                     audio.playSound('pour');
+                } else {
+                    addLog("Out of Water!", 'error');
+                    audio.playSound('error');
                 }
             } else if (action === 'STIR') {
                 brewing.setStrictStep(4); // Jump to "Stirred"
@@ -262,19 +263,30 @@ export const useGame = (initialState) => {
                     brewing.setStrictStep(5); // Jump to "Plunged/Ready"
                     addLog("Plunged!", 'success');
                     audio.playSound('action');
+                } else {
+                    addLog("Out of Filters!", 'error');
+                    audio.playSound('error');
                 }
             }
         } else if (mode === 'matcha') {
             if (action === 'SIFT') {
-                inventory.deductResources({ 'matcha_powder': 10 });
-                brewing.setStrictStep(1);
-                addLog("Matcha sifted.", 'success');
-                audio.playSound('action');
+                if (inventory.deductResources({ 'matcha_powder': 10 })) {
+                    brewing.setStrictStep(1);
+                    addLog("Matcha sifted.", 'success');
+                    audio.playSound('action');
+                } else {
+                    addLog("Out of Matcha Powder!", 'error');
+                    audio.playSound('error');
+                }
             } else if (action === 'ADD_WATER') {
-                inventory.deductResources({ 'water': 100 });
-                brewing.setStrictStep(2);
-                addLog("Hot water added.", 'success');
-                audio.playSound('pour');
+                if (inventory.deductResources({ 'water': 100 })) {
+                    brewing.setStrictStep(2);
+                    addLog("Hot water added.", 'success');
+                    audio.playSound('pour');
+                } else {
+                    addLog("Out of Water!", 'error');
+                    audio.playSound('error');
+                }
             } else if (action === 'WHISK') {
                 brewing.setStrictStep(3);
                 addLog("Whisked to froth.", 'success');
@@ -282,24 +294,36 @@ export const useGame = (initialState) => {
             }
         } else if (mode === 'espresso') {
             if (action === 'GRIND') {
-                inventory.deductResources({ 'beans_premium': 18 });
-                brewing.setStrictStep(1);
-                addLog("Espresso beans ground.", 'success');
-                audio.playSound('grind');
+                if (inventory.deductResources({ 'beans_premium': 18 })) {
+                    brewing.setStrictStep(1);
+                    addLog("Espresso beans ground.", 'success');
+                    audio.playSound('grind');
+                } else {
+                    addLog("Out of Premium Beans!", 'error');
+                    audio.playSound('error');
+                }
             } else if (action === 'TAMP') {
                 brewing.setStrictStep(2);
                 addLog("Puck tamped.", 'success');
                 audio.playSound('action');
             } else if (action === 'PULL_SHOT') {
-                inventory.deductResources({ 'water': 50 });
-                brewing.setStrictStep(3);
-                addLog("Shot pulled.", 'success');
-                audio.playSound('pour');
+                if (inventory.deductResources({ 'water': 50 })) {
+                    brewing.setStrictStep(3);
+                    addLog("Shot pulled.", 'success');
+                    audio.playSound('pour');
+                } else {
+                    addLog("Out of Water!", 'error');
+                    audio.playSound('error');
+                }
             } else if (action === 'STEAM_MILK') {
-                inventory.deductResources({ 'milk': 150 });
-                brewing.setStrictStep(4);
-                addLog("Milk steamed.", 'success');
-                audio.playSound('steam');
+                if (inventory.deductResources({ 'milk': 150 })) {
+                    brewing.setStrictStep(4);
+                    addLog("Milk steamed.", 'success');
+                    audio.playSound('steam');
+                } else {
+                    addLog("Out of Milk!", 'error');
+                    audio.playSound('error');
+                }
             } else if (action === 'POUR') {
                 brewing.setStrictStep(5);
                 addLog("Latte art poured.", 'success');
@@ -666,8 +690,13 @@ export const useGame = (initialState) => {
         saveGame,
         loadGame,
         resetGame: () => {
-            localStorage.removeItem('baristaSimSave');
-            window.location.reload();
+            console.log("Resetting Game...");
+            try {
+                localStorage.removeItem('baristaSimSave');
+                window.location.reload();
+            } catch (e) {
+                console.error("Reset failed:", e);
+            }
         },
         toggleDebugMenu: () => setUiState(prev => ({ ...prev, showDebug: !prev.showDebug })),
         selectMode: (m) => { brewing.setMode(m); setUiState(prev => ({ ...prev, activeModal: null })); audio.playSound('action'); },
